@@ -7,7 +7,21 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="./css/style.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'navy': '#003366',
+                        'orange': '#FF9933',
+                        'green': '#228B22',
+                    }
+                }
+            }
+        }
+    </script>
 </head>
 <body class="bg-white font-inter">
     <!-- Navigation -->
@@ -16,15 +30,15 @@
             <div class="flex justify-between h-16">
                 <div class="flex items-center">
                     <div class="flex-shrink-0">
-                        <a href="index.html" class="text-white text-2xl font-bold">
+                        <a href="./index.html" class="text-white text-2xl font-bold">
                             <i class="fas fa-calculator mr-2"></i>VATAX
                         </a>
                     </div>
                     <div class="hidden md:ml-10 md:flex md:space-x-8">
-                        <a href="index.html" class="nav-link active">Home</a>
-                        <a href="vat-calculator.html" class="nav-link">VAT Calculator</a>
-                        <a href="tax-calculator.html" class="nav-link">Tax Calculator</a>
-                        <a href="pricing.html" class="nav-link">Pricing</a>
+                        <a href="./index.html" class="nav-link active">Home</a>
+                        <a href="./vat-calculator.html" class="nav-link">VAT Calculator</a>
+                        <a href="./tax-calculator.html" class="nav-link">Tax Calculator</a>
+                        <a href="./pricing.html" class="nav-link">Pricing</a>
                     </div>
                 </div>
                 <div class="flex items-center space-x-4">
@@ -39,7 +53,7 @@
                             <i class="fas fa-chevron-down ml-2"></i>
                         </button>
                         <div id="dropdown-menu" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg hidden">
-                            <a href="dashboard.html" class="block px-4 py-2 text-navy hover:bg-gray-100">Dashboard</a>
+                            <a href="./dashboard.html" class="block px-4 py-2 text-navy hover:bg-gray-100">Dashboard</a>
                             <a href="#" onclick="logout()" class="block px-4 py-2 text-navy hover:bg-gray-100">Logout</a>
                         </div>
                     </div>
@@ -52,10 +66,10 @@
         <!-- Mobile menu -->
         <div id="mobile-menu" class="md:hidden hidden bg-navy">
             <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-                <a href="index.html" class="mobile-nav-link">Home</a>
-                <a href="vat-calculator.html" class="mobile-nav-link">VAT Calculator</a>
-                <a href="tax-calculator.html" class="mobile-nav-link">Tax Calculator</a>
-                <a href="pricing.html" class="mobile-nav-link">Pricing</a>
+                <a href="./index.html" class="mobile-nav-link">Home</a>
+                <a href="./vat-calculator.html" class="mobile-nav-link">VAT Calculator</a>
+                <a href="./tax-calculator.html" class="mobile-nav-link">Tax Calculator</a>
+                <a href="./pricing.html" class="mobile-nav-link">Pricing</a>
                 <div class="mt-4 space-y-2">
                     <button onclick="showLogin()" class="w-full btn-secondary">Log In</button>
                     <button onclick="showSignup()" class="w-full btn-primary">Sign Up</button>
@@ -79,10 +93,10 @@
                         Perfect for freelancers, small businesses, and salaried professionals.
                     </p>
                     <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                        <a href="vat-calculator.html" class="btn-orange btn-lg">
+                        <a href="./vat-calculator.html" class="btn-orange btn-lg">
                             <i class="fas fa-percentage mr-2"></i>Calculate VAT
                         </a>
-                        <a href="tax-calculator.html" class="btn-green btn-lg">
+                        <a href="./tax-calculator.html" class="btn-green btn-lg">
                             <i class="fas fa-coins mr-2"></i>Calculate Tax
                         </a>
                     </div>
@@ -203,7 +217,7 @@
                         <p class="text-sm text-gray-300">Generate professional tax reports</p>
                     </div>
                     <div class="text-center">
-                        <i class="fas fa-email text-orange text-3xl mb-3"></i>
+                        <i class="fas fa-envelope text-orange text-3xl mb-3"></i>
                         <h4 class="font-semibold mb-2">Email Reports</h4>
                         <p class="text-sm text-gray-300">Send calculations via email/SMS</p>
                     </div>
@@ -214,7 +228,7 @@
                     </div>
                 </div>
                 <div class="text-center mt-8">
-                    <a href="pricing.html" class="btn-orange btn-lg">
+                    <a href="./pricing.html" class="btn-orange btn-lg">
                         Upgrade to Pro - Only ৳99/month
                     </a>
                 </div>
@@ -285,14 +299,14 @@
                 <div>
                     <h4 class="font-semibold mb-4">Calculators</h4>
                     <ul class="space-y-2 text-gray-300">
-                        <li><a href="vat-calculator.html" class="hover:text-orange">VAT Calculator</a></li>
-                        <li><a href="tax-calculator.html" class="hover:text-orange">Income Tax Calculator</a></li>
+                        <li><a href="./vat-calculator.html" class="hover:text-orange">VAT Calculator</a></li>
+                        <li><a href="./tax-calculator.html" class="hover:text-orange">Income Tax Calculator</a></li>
                     </ul>
                 </div>
                 <div>
                     <h4 class="font-semibold mb-4">Company</h4>
                     <ul class="space-y-2 text-gray-300">
-                        <li><a href="pricing.html" class="hover:text-orange">Pricing</a></li>
+                        <li><a href="./pricing.html" class="hover:text-orange">Pricing</a></li>
                         <li><a href="#" class="hover:text-orange">About Us</a></li>
                         <li><a href="#" class="hover:text-orange">Contact</a></li>
                     </ul>
@@ -378,6 +392,6 @@
         </div>
     </div>
 
-    <script src="js/main.js"></script>
+    <script src="./js/main.js"></script>
 </body>
 </html>
