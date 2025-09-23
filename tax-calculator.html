@@ -3,76 +3,411 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tax Calculator</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-        label {
-            display: block;
-            margin-bottom: 5px;
-        }
-        input[type="number"] {
-            width: 200px;
-            padding: 5px;
-            margin-bottom: 10px;
-        }
-        button {
-            padding: 10px 15px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-        #result {
-            margin-top: 20px;
-            font-weight: bold;
-        }
-    </style>
-</head>
-<body>
-
-    <h1>Tax Calculator</h1>
-
-    <label for="income">Enter your annual income:</label>
-    <input type="number" id="income" placeholder="e.g., 50000">
-
-    <button onclick="calculateTax()">Calculate Tax</button>
-
-    <div id="result"></div>
-
+    <title>Income Tax Calculator - VATAX</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="./css/style.css">
+    
     <script>
-        function calculateTax() {
-            var income = document.getElementById("income").value;
-            income = parseFloat(income);
-
-            if (isNaN(income)) {
-                document.getElementById("result").innerText = "Please enter a valid income.";
-                return;
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'navy': '#003366',
+                        'orange': '#FF9933',
+                        'green': '#228B22',
+                    }
+                }
             }
-
-            var tax = calculateTaxAmount(income);
-
-            document.getElementById("result").innerText = "Your tax is: $" + tax.toFixed(2);
-        }
-
-        function calculateTaxAmount(income) {
-            var tax = 0;
-
-            if (income <= 10000) {
-                tax = income * 0.10; // 10%
-            } else if (income <= 40000) {
-                tax = 1000 + (income - 10000) * 0.20; // 20%
-            } else if (income <= 80000) {
-                tax = 7000 + (income - 40000) * 0.30; // 30%
-            } else {
-                tax = 19000 + (income - 80000) * 0.40; // 40%
-            }
-
-            return tax;
         }
     </script>
+</head>
+<body class="bg-white font-inter">
+    <!-- Navigation -->
+    <nav class="bg-navy shadow-lg fixed w-full top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <a href="./index.html" class="text-white text-2xl font-bold">
+                            <i class="fas fa-calculator mr-2"></i>VATAX
+                        </a>
+                    </div>
+                    <div class="hidden md:ml-10 md:flex md:space-x-8">
+                        <a href="./index.html" class="nav-link">Home</a>
+                        <a href="./vat-calculator.html" class="nav-link">VAT Calculator</a>
+                        <a href="./tax-calculator.html" class="nav-link active">Tax Calculator</a>
+                        <a href="./pricing.html" class="nav-link">Pricing</a>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div id="auth-buttons" class="hidden md:flex space-x-3">
+                        <button onclick="showLogin()" class="btn-secondary">Log In</button>
+                        <button onclick="showSignup()" class="btn-primary">Sign Up</button>
+                    </div>
+                    <div id="user-menu" class="hidden relative">
+                        <button id="user-dropdown-btn" class="flex items-center text-white hover:text-orange">
+                            <i class="fas fa-user-circle mr-2"></i>
+                            <span id="user-name">User</span>
+                            <i class="fas fa-chevron-down ml-2"></i>
+                        </button>
+                        <div id="dropdown-menu" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg hidden">
+                            <a href="./dashboard.html" class="block px-4 py-2 text-navy hover:bg-gray-100">Dashboard</a>
+                            <a href="#" onclick="logout()" class="block px-4 py-2 text-navy hover:bg-gray-100">Logout</a>
+                        </div>
+                    </div>
+                    <button class="md:hidden text-white" onclick="toggleMobileMenu()">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Mobile menu -->
+        <div id="mobile-menu" class="md:hidden hidden bg-navy">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="./index.html" class="mobile-nav-link">Home</a>
+                <a href="./vat-calculator.html" class="mobile-nav-link">VAT Calculator</a>
+                <a href="./tax-calculator.html" class="mobile-nav-link active">Tax Calculator</a>
+                <a href="./pricing.html" class="mobile-nav-link">Pricing</a>
+                <div class="mt-4 space-y-2">
+                    <button onclick="showLogin()" class="w-full btn-secondary">Log In</button>
+                    <button onclick="showSignup()" class="w-full btn-primary">Sign Up</button>
+                </div>
+            </div>
+        </div>
+    </nav>
 
+    <!-- Main Content -->
+    <main class="pt-16">
+        <!-- Header Section -->
+        <section class="bg-gradient-to-br from-navy to-blue-900 text-white py-16">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center">
+                    <h1 class="text-4xl md:text-5xl font-bold mb-4">
+                        Income Tax Calculator
+                    </h1>
+                    <p class="text-xl text-gray-200 max-w-3xl mx-auto">
+                        Calculate your income tax liability with Bangladesh-specific tax slabs and rates
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tax Calculator Section -->
+        <section class="py-16">
+            <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid lg:grid-cols-3 gap-8">
+                    <!-- Calculator Form -->
+                    <div class="lg:col-span-2">
+                        <div class="calculator-card tax-card">
+                            <h2 class="text-2xl font-bold text-navy mb-6">
+                                <i class="fas fa-coins text-green mr-2"></i>Calculate Income Tax
+                            </h2>
+                            
+                            <!-- Tax Year and Category -->
+                            <div class="grid md:grid-cols-2 gap-6 mb-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Tax Year</label>
+                                    <select id="tax-year" class="w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green">
+                                        <option value="2024-25">2024-2025</option>
+                                        <option value="2023-24">2023-2024</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Taxpayer Category</label>
+                                    <div class="space-y-2">
+                                        <label class="flex items-center">
+                                            <input type="radio" name="taxpayer-category" value="individual" checked class="mr-2">
+                                            <span>Individual (General)</span>
+                                        </label>
+                                        <label class="flex items-center">
+                                            <input type="radio" name="taxpayer-category" value="female" class="mr-2">
+                                            <span>Female Taxpayer</span>
+                                        </label>
+                                        <label class="flex items-center">
+                                            <input type="radio" name="taxpayer-category" value="senior" class="mr-2">
+                                            <span>Senior Citizen (65+)</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Income Sources -->
+                            <div class="mb-6">
+                                <h3 class="text-lg font-semibold text-navy mb-4">Income Sources</h3>
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Salary Income (৳)</label>
+                                        <input type="number" id="salary-income" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green" placeholder="Annual salary income">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Business Income (৳)</label>
+                                        <input type="number" id="business-income" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green" placeholder="Annual business income">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Rental Income (৳)</label>
+                                        <input type="number" id="rental-income" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green" placeholder="Annual rental income">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Other Income (৳)</label>
+                                        <input type="number" id="other-income" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green" placeholder="Other annual income">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Deductions -->
+                            <div class="mb-6">
+                                <h3 class="text-lg font-semibold text-navy mb-4">Deductions & Exemptions</h3>
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Investment Allowance (৳)</label>
+                                        <input type="number" id="investment-deduction" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green" placeholder="Up to 25% of income">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Zakat Payment (৳)</label>
+                                        <input type="number" id="zakat-deduction" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green" placeholder="Zakat amount">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Charitable Donations (৳)</label>
+                                        <input type="number" id="donation-deduction" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green" placeholder="Donation amount">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Other Deductions (৳)</label>
+                                        <input type="number" id="other-deduction" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green" placeholder="Other deductions">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="flex space-x-3">
+                                <button onclick="calculateTax()" class="flex-1 btn-green py-3">
+                                    <i class="fas fa-calculator mr-2"></i>Calculate Tax
+                                </button>
+                                <button onclick="clearTaxCalculation()" class="px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50">
+                                    <i class="fas fa-redo mr-2"></i>Clear
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Results and Tax Slabs -->
+                    <div class="space-y-6">
+                        <!-- Results Section -->
+                        <div id="no-tax-results" class="bg-gray-50 border border-gray-200 rounded-lg p-6 text-center">
+                            <i class="fas fa-coins text-gray-400 text-4xl mb-4"></i>
+                            <h3 class="text-lg font-semibold text-gray-600 mb-2">No Calculation Yet</h3>
+                            <p class="text-gray-500">Enter income details to see tax calculation</p>
+                        </div>
+
+                        <div id="tax-calculation-results" class="hidden">
+                            <div class="result-display tax-result">
+                                <h3 class="text-xl font-semibold text-navy mb-4">Tax Calculation Results</h3>
+                                
+                                <div class="space-y-3">
+                                    <div class="result-item">
+                                        <span class="result-label">Total Income:</span>
+                                        <span class="result-value">৳<span id="tax-result-total-income">0</span></span>
+                                    </div>
+                                    <div class="result-item">
+                                        <span class="result-label">Total Deductions:</span>
+                                        <span class="result-value">৳<span id="tax-result-deductions">0</span></span>
+                                    </div>
+                                    <div class="result-item">
+                                        <span class="result-label">Taxable Income:</span>
+                                        <span class="result-value">৳<span id="tax-result-taxable">0</span></span>
+                                    </div>
+                                    <div class="result-item">
+                                        <span class="result-label">Tax Liability:</span>
+                                        <span class="result-value text-green">৳<span id="tax-result-liability">0</span></span>
+                                    </div>
+                                    <div class="result-item">
+                                        <span class="result-label">Monthly Tax:</span>
+                                        <span class="result-value">৳<span id="monthly-tax">0</span>/month</span>
+                                    </div>
+                                </div>
+
+                                <!-- Tax Slab Breakdown -->
+                                <div id="tax-slab-breakdown" class="mt-4 space-y-2">
+                                    <!-- Breakdown will be inserted here -->
+                                </div>
+
+                                <!-- Pro Features -->
+                                <div id="tax-pro-features" class="mt-6 pt-6 border-t border-gray-200">
+                                    <h4 class="font-semibold text-navy mb-3">Tax Tools</h4>
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <button onclick="saveTaxCalculation()" class="btn-outline-orange py-2 text-sm" data-pro="true">
+                                            <i class="fas fa-save mr-1"></i>Save
+                                        </button>
+                                        <button onclick="generateTaxReport()" class="btn-outline-orange py-2 text-sm" data-pro="true">
+                                            <i class="fas fa-file-pdf mr-1"></i>Report
+                                        </button>
+                                        <button onclick="getTaxTips()" class="btn-outline-orange py-2 text-sm" data-pro="true">
+                                            <i class="fas fa-lightbulb mr-1"></i>Tax Tips
+                                        </button>
+                                        <button onclick="scheduleTaxReminder()" class="btn-outline-orange py-2 text-sm" data-pro="true">
+                                            <i class="fas fa-bell mr-1"></i>Reminder
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tax Slabs Info -->
+                        <div class="bg-green-50 border border-green-200 rounded-lg p-6">
+                            <h3 class="text-lg font-semibold text-navy mb-4">Tax Slabs (2024-25)</h3>
+                            <div id="tax-slabs-info" class="space-y-3">
+                                <!-- Tax slabs will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tax Information Section -->
+        <section class="py-16 bg-gray-50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-3xl font-bold text-center text-navy mb-12">Bangladesh Income Tax Information</h2>
+                <div class="grid md:grid-cols-3 gap-8">
+                    <div class="text-center">
+                        <div class="w-16 h-16 bg-green rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-user text-white text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-navy mb-2">Individual Taxpayers</h3>
+                        <p class="text-gray-600">Tax-free threshold: ৳3,50,000</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="w-16 h-16 bg-orange rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-female text-white text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-navy mb-2">Female Taxpayers</h3>
+                        <p class="text-gray-600">Tax-free threshold: ৳4,00,000</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="w-16 h-16 bg-navy rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-user-friends text-white text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-navy mb-2">Senior Citizens</h3>
+                        <p class="text-gray-600">Tax-free threshold: ৳4,50,000 (65+)</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-navy text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-xl font-bold mb-4">
+                        <i class="fas fa-calculator mr-2"></i>VATAX
+                    </h3>
+                    <p class="text-gray-300 mb-4">Smart VAT & Tax Calculator for Bangladesh</p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-300 hover:text-orange"><i class="fab fa-facebook"></i></a>
+                        <a href="#" class="text-gray-300 hover:text-orange"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="text-gray-300 hover:text-orange"><i class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Calculators</h4>
+                    <ul class="space-y-2 text-gray-300">
+                        <li><a href="./vat-calculator.html" class="hover:text-orange">VAT Calculator</a></li>
+                        <li><a href="./tax-calculator.html" class="hover:text-orange">Income Tax Calculator</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Company</h4>
+                    <ul class="space-y-2 text-gray-300">
+                        <li><a href="./pricing.html" class="hover:text-orange">Pricing</a></li>
+                        <li><a href="#" class="hover:text-orange">About Us</a></li>
+                        <li><a href="#" class="hover:text-orange">Contact</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Support</h4>
+                    <ul class="space-y-2 text-gray-300">
+                        <li><a href="#" class="hover:text-orange">Help Center</a></li>
+                        <li><a href="#" class="hover:text-orange">Privacy Policy</a></li>
+                        <li><a href="#" class="hover:text-orange">Terms of Service</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-300">
+                <p>&copy; 2024 VATAX. All rights reserved. | Built for Bangladesh</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Login Modal -->
+    <div id="login-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="text-2xl font-bold text-navy">Login to VATAX</h2>
+                <button onclick="closeModal('login-modal')" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="login-form" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                    <input type="email" id="login-email" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                    <input type="password" id="login-password" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange" required>
+                </div>
+                <button type="submit" class="w-full btn-primary">Login</button>
+                <div class="text-center">
+                    <button type="button" onclick="showSignup(); closeModal('login-modal')" class="text-orange hover:text-orange-dark">
+                        Don't have an account? Sign up
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Signup Modal -->
+    <div id="signup-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="text-2xl font-bold text-navy">Join VATAX</h2>
+                <button onclick="closeModal('signup-modal')" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="signup-form" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                    <input type="text" id="signup-name" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                    <input type="email" id="signup-email" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                    <input type="password" id="signup-password" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange" required>
+                </div>
+                <div class="flex items-center">
+                    <input type="checkbox" id="terms-checkbox" class="mr-2" required>
+                    <label for="terms-checkbox" class="text-sm text-gray-700">
+                        I agree to the <a href="#" class="text-orange hover:text-orange-dark">Terms of Service</a>
+                    </label>
+                </div>
+                <button type="submit" class="w-full btn-primary">Create Account</button>
+                <div class="text-center">
+                    <button type="button" onclick="showLogin(); closeModal('signup-modal')" class="text-orange hover:text-orange-dark">
+                        Already have an account? Login
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="./js/tax-calculator.js"></script>
+    <script src="./js/main.js"></script>
 </body>
 </html>
