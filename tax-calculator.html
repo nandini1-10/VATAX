@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tax Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input[type="number"] {
+            width: 200px;
+            padding: 5px;
+            margin-bottom: 10px;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        #result {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Tax Calculator</h1>
+
+    <label for="income">Enter your annual income:</label>
+    <input type="number" id="income" placeholder="e.g., 50000">
+
+    <button onclick="calculateTax()">Calculate Tax</button>
+
+    <div id="result"></div>
+
+    <script>
+        function calculateTax() {
+            var income = document.getElementById("income").value;
+            income = parseFloat(income);
+
+            if (isNaN(income)) {
+                document.getElementById("result").innerText = "Please enter a valid income.";
+                return;
+            }
+
+            var tax = calculateTaxAmount(income);
+
+            document.getElementById("result").innerText = "Your tax is: $" + tax.toFixed(2);
+        }
+
+        function calculateTaxAmount(income) {
+            var tax = 0;
+
+            if (income <= 10000) {
+                tax = income * 0.10; // 10%
+            } else if (income <= 40000) {
+                tax = 1000 + (income - 10000) * 0.20; // 20%
+            } else if (income <= 80000) {
+                tax = 7000 + (income - 40000) * 0.30; // 30%
+            } else {
+                tax = 19000 + (income - 80000) * 0.40; // 40%
+            }
+
+            return tax;
+        }
+    </script>
+
+</body>
+</html>

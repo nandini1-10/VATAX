@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VAT Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .container {
+            width: 300px;
+            margin: auto;
+        }
+        label, input, button {
+            margin-bottom: 10px;
+            display: block;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        input {
+            padding: 8px;
+        }
+        button {
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #3e8e41;
+        }
+        #result {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>VAT Calculator</h1>
+        <label for="amount">Enter Amount:</label>
+        <input type="number" id="amount" placeholder="Amount" required>
+        <label for="vatRate">Enter VAT Rate (%):</label>
+        <input type="number" id="vatRate" placeholder="VAT Rate" value="20" required>
+        <button onclick="calculateVAT()">Calculate</button>
+        <div id="result"></div>
+    </div>
+
+    <script>
+        function calculateVAT() {
+            var amount = parseFloat(document.getElementById("amount").value);
+            var vatRate = parseFloat(document.getElementById("vatRate").value);
+
+            if (isNaN(amount) || isNaN(vatRate)) {
+                document.getElementById("result").innerText = "Please enter valid numbers.";
+                return;
+            }
+
+            var vatAmount = amount * (vatRate / 100);
+            var totalAmount = amount + vatAmount;
+
+            document.getElementById("result").innerText = "VAT Amount: " + vatAmount.toFixed(2) + "\nTotal Amount: " + totalAmount.toFixed(2);
+        }
+    </script>
+</body>
+</html>
