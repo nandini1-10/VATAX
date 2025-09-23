@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VATAX - Smart VAT & Tax Calculator for Bangladesh</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-white font-inter">
+    <!-- Navigation -->
+    <nav class="bg-navy shadow-lg fixed w-full top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <a href="index.html" class="text-white text-2xl font-bold">
+                            <i class="fas fa-calculator mr-2"></i>VATAX
+                        </a>
+                    </div>
+                    <div class="hidden md:ml-10 md:flex md:space-x-8">
+                        <a href="index.html" class="nav-link active">Home</a>
+                        <a href="vat-calculator.html" class="nav-link">VAT Calculator</a>
+                        <a href="tax-calculator.html" class="nav-link">Tax Calculator</a>
+                        <a href="pricing.html" class="nav-link">Pricing</a>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div id="auth-buttons" class="hidden md:flex space-x-3">
+                        <button onclick="showLogin()" class="btn-secondary">Log In</button>
+                        <button onclick="showSignup()" class="btn-primary">Sign Up</button>
+                    </div>
+                    <div id="user-menu" class="hidden relative">
+                        <button id="user-dropdown-btn" class="flex items-center text-white hover:text-orange">
+                            <i class="fas fa-user-circle mr-2"></i>
+                            <span id="user-name">User</span>
+                            <i class="fas fa-chevron-down ml-2"></i>
+                        </button>
+                        <div id="dropdown-menu" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg hidden">
+                            <a href="dashboard.html" class="block px-4 py-2 text-navy hover:bg-gray-100">Dashboard</a>
+                            <a href="#" onclick="logout()" class="block px-4 py-2 text-navy hover:bg-gray-100">Logout</a>
+                        </div>
+                    </div>
+                    <button class="md:hidden text-white" onclick="toggleMobileMenu()">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Mobile menu -->
+        <div id="mobile-menu" class="md:hidden hidden bg-navy">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="index.html" class="mobile-nav-link">Home</a>
+                <a href="vat-calculator.html" class="mobile-nav-link">VAT Calculator</a>
+                <a href="tax-calculator.html" class="mobile-nav-link">Tax Calculator</a>
+                <a href="pricing.html" class="mobile-nav-link">Pricing</a>
+                <div class="mt-4 space-y-2">
+                    <button onclick="showLogin()" class="w-full btn-secondary">Log In</button>
+                    <button onclick="showSignup()" class="w-full btn-primary">Sign Up</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="pt-16">
+        <!-- Hero Section -->
+        <section class="bg-gradient-to-br from-navy to-blue-900 text-white py-20">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center">
+                    <h1 class="text-4xl md:text-6xl font-bold mb-6">
+                        Smart VAT & Tax Calculator
+                        <span class="text-orange block">for Bangladesh</span>
+                    </h1>
+                    <p class="text-xl md:text-2xl mb-8 text-gray-200 max-w-3xl mx-auto">
+                        Calculate VAT and Income Tax accurately with Bangladesh-specific rates. 
+                        Perfect for freelancers, small businesses, and salaried professionals.
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                        <a href="vat-calculator.html" class="btn-orange btn-lg">
+                            <i class="fas fa-percentage mr-2"></i>Calculate VAT
+                        </a>
+                        <a href="tax-calculator.html" class="btn-green btn-lg">
+                            <i class="fas fa-coins mr-2"></i>Calculate Tax
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quick Calculator Widgets -->
+        <section class="py-16 bg-gray-50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-3xl font-bold text-center text-navy mb-12">Quick Calculators</h2>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <!-- VAT Quick Calculator -->
+                    <div class="bg-white rounded-lg shadow-lg p-6 border-t-4 border-orange">
+                        <h3 class="text-xl font-semibold text-navy mb-4">
+                            <i class="fas fa-percentage text-orange mr-2"></i>VAT Calculator
+                        </h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Base Amount (৳)</label>
+                                <input type="number" id="quick-vat-amount" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange" placeholder="Enter amount">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">VAT Rate (%)</label>
+                                <select id="quick-vat-rate" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange">
+                                    <option value="15">15% (Standard)</option>
+                                    <option value="7.5">7.5% (Reduced)</option>
+                                    <option value="5">5% (Essential goods)</option>
+                                    <option value="0">0% (Export/Zero-rated)</option>
+                                </select>
+                            </div>
+                            <button onclick="calculateQuickVAT()" class="w-full btn-orange">Calculate VAT</button>
+                            <div id="quick-vat-result" class="hidden bg-orange-50 border border-orange rounded-md p-4">
+                                <div class="text-sm text-gray-600">
+                                    <div>VAT Amount: ৳<span id="quick-vat-amount-result">0</span></div>
+                                    <div class="font-semibold text-navy">Total with VAT: ৳<span id="quick-vat-total-result">0</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tax Quick Calculator -->
+                    <div class="bg-white rounded-lg shadow-lg p-6 border-t-4 border-green">
+                        <h3 class="text-xl font-semibold text-navy mb-4">
+                            <i class="fas fa-coins text-green mr-2"></i>Income Tax Calculator
+                        </h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Annual Income (৳)</label>
+                                <input type="number" id="quick-tax-income" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green" placeholder="Enter annual income">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Tax Year</label>
+                                <select id="quick-tax-year" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green">
+                                    <option value="2024-25">2024-25</option>
+                                    <option value="2023-24">2023-24</option>
+                                </select>
+                            </div>
+                            <button onclick="calculateQuickTax()" class="w-full btn-green">Calculate Tax</button>
+                            <div id="quick-tax-result" class="hidden bg-green-50 border border-green rounded-md p-4">
+                                <div class="text-sm text-gray-600">
+                                    <div>Taxable Income: ৳<span id="quick-taxable-income">0</span></div>
+                                    <div class="font-semibold text-navy">Total Tax: ৳<span id="quick-tax-amount">0</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section class="py-16">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-3xl font-bold text-center text-navy mb-12">Why Choose VATAX?</h2>
+                <div class="grid md:grid-cols-3 gap-8">
+                    <div class="text-center">
+                        <div class="w-16 h-16 bg-orange rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-calculator text-white text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-navy mb-2">Accurate Calculations</h3>
+                        <p class="text-gray-600">Bangladesh-specific VAT and tax rates updated according to latest government regulations.</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="w-16 h-16 bg-green rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-mobile-alt text-white text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-navy mb-2">Mobile Friendly</h3>
+                        <p class="text-gray-600">Calculate taxes on-the-go with our responsive design that works on all devices.</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="w-16 h-16 bg-navy rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-shield-alt text-white text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-navy mb-2">Secure & Private</h3>
+                        <p class="text-gray-600">Your financial data is protected with enterprise-grade security and privacy.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pro Features Highlight -->
+        <section class="py-16 bg-navy text-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold mb-4">Upgrade to VATAX Pro</h2>
+                    <p class="text-xl text-gray-200">Unlock advanced features for professional tax management</p>
+                </div>
+                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="text-center">
+                        <i class="fas fa-history text-orange text-3xl mb-3"></i>
+                        <h4 class="font-semibold mb-2">Calculation History</h4>
+                        <p class="text-sm text-gray-300">Save and track all your calculations</p>
+                    </div>
+                    <div class="text-center">
+                        <i class="fas fa-file-pdf text-orange text-3xl mb-3"></i>
+                        <h4 class="font-semibold mb-2">PDF Reports</h4>
+                        <p class="text-sm text-gray-300">Generate professional tax reports</p>
+                    </div>
+                    <div class="text-center">
+                        <i class="fas fa-email text-orange text-3xl mb-3"></i>
+                        <h4 class="font-semibold mb-2">Email Reports</h4>
+                        <p class="text-sm text-gray-300">Send calculations via email/SMS</p>
+                    </div>
+                    <div class="text-center">
+                        <i class="fas fa-lightbulb text-orange text-3xl mb-3"></i>
+                        <h4 class="font-semibold mb-2">Tax Tips</h4>
+                        <p class="text-sm text-gray-300">Get tax-saving suggestions</p>
+                    </div>
+                </div>
+                <div class="text-center mt-8">
+                    <a href="pricing.html" class="btn-orange btn-lg">
+                        Upgrade to Pro - Only ৳99/month
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Testimonials -->
+        <section class="py-16 bg-gray-50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-3xl font-bold text-center text-navy mb-12">What Our Users Say</h2>
+                <div class="grid md:grid-cols-3 gap-8">
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="flex items-center mb-4">
+                            <div class="w-12 h-12 bg-orange rounded-full flex items-center justify-center mr-4">
+                                <span class="text-white font-bold">AH</span>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-navy">Ahmed Hassan</h4>
+                                <p class="text-sm text-gray-600">Freelance Developer</p>
+                            </div>
+                        </div>
+                        <p class="text-gray-700">"VATAX has made VAT calculations so much easier for my freelance projects. The Bangladesh-specific rates are accurate and up-to-date."</p>
+                    </div>
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="flex items-center mb-4">
+                            <div class="w-12 h-12 bg-green rounded-full flex items-center justify-center mr-4">
+                                <span class="text-white font-bold">SR</span>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-navy">Salma Rahman</h4>
+                                <p class="text-sm text-gray-600">Small Business Owner</p>
+                            </div>
+                        </div>
+                        <p class="text-gray-700">"The tax calculator helps me plan my business finances better. The pro features are worth every taka for the detailed reports."</p>
+                    </div>
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="flex items-center mb-4">
+                            <div class="w-12 h-12 bg-navy rounded-full flex items-center justify-center mr-4">
+                                <span class="text-white font-bold">MK</span>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-navy">Mahbub Khan</h4>
+                                <p class="text-sm text-gray-600">Corporate Employee</p>
+                            </div>
+                        </div>
+                        <p class="text-gray-700">"Perfect for calculating my annual tax liability. The interface is clean and the calculations are always accurate."</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-navy text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-xl font-bold mb-4">
+                        <i class="fas fa-calculator mr-2"></i>VATAX
+                    </h3>
+                    <p class="text-gray-300 mb-4">Smart VAT & Tax Calculator for Bangladesh</p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-300 hover:text-orange"><i class="fab fa-facebook"></i></a>
+                        <a href="#" class="text-gray-300 hover:text-orange"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="text-gray-300 hover:text-orange"><i class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Calculators</h4>
+                    <ul class="space-y-2 text-gray-300">
+                        <li><a href="vat-calculator.html" class="hover:text-orange">VAT Calculator</a></li>
+                        <li><a href="tax-calculator.html" class="hover:text-orange">Income Tax Calculator</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Company</h4>
+                    <ul class="space-y-2 text-gray-300">
+                        <li><a href="pricing.html" class="hover:text-orange">Pricing</a></li>
+                        <li><a href="#" class="hover:text-orange">About Us</a></li>
+                        <li><a href="#" class="hover:text-orange">Contact</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Support</h4>
+                    <ul class="space-y-2 text-gray-300">
+                        <li><a href="#" class="hover:text-orange">Help Center</a></li>
+                        <li><a href="#" class="hover:text-orange">Privacy Policy</a></li>
+                        <li><a href="#" class="hover:text-orange">Terms of Service</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-300">
+                <p>&copy; 2024 VATAX. All rights reserved. | Built for Bangladesh</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Login Modal -->
+    <div id="login-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="text-2xl font-bold text-navy">Login to VATAX</h2>
+                <button onclick="closeModal('login-modal')" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="login-form" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                    <input type="email" id="login-email" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                    <input type="password" id="login-password" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange" required>
+                </div>
+                <button type="submit" class="w-full btn-primary">Login</button>
+                <div class="text-center">
+                    <button type="button" onclick="showSignup(); closeModal('login-modal')" class="text-orange hover:text-orange-dark">
+                        Don't have an account? Sign up
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Signup Modal -->
+    <div id="signup-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="text-2xl font-bold text-navy">Join VATAX</h2>
+                <button onclick="closeModal('signup-modal')" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="signup-form" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                    <input type="text" id="signup-name" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                    <input type="email" id="signup-email" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                    <input type="password" id="signup-password" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange" required>
+                </div>
+                <div class="flex items-center">
+                    <input type="checkbox" id="terms-checkbox" class="mr-2" required>
+                    <label for="terms-checkbox" class="text-sm text-gray-700">
+                        I agree to the <a href="#" class="text-orange hover:text-orange-dark">Terms of Service</a>
+                    </label>
+                </div>
+                <button type="submit" class="w-full btn-primary">Create Account</button>
+                <div class="text-center">
+                    <button type="button" onclick="showLogin(); closeModal('signup-modal')" class="text-orange hover:text-orange-dark">
+                        Already have an account? Login
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+</body>
+</html>
