@@ -1,7 +1,4 @@
-// VATAX - Main JavaScript File
-// Netlify compatible fixes applied
-
-// Global state management
+// VATAX - Fixed Main JavaScript for Netlify
 window.VATAX = {
     currentUser: null,
     userSession: null,
@@ -15,151 +12,33 @@ window.VATAX = {
     }
 };
 
-// DOM Content Loaded Event
+// DOM Content Loaded
 document.addEventListener('DOMContentLoaded', function() {
     initializeApp();
 });
 
-// Initialize Application
 function initializeApp() {
     checkUserSession();
     setupEventListeners();
     initializeModals();
     updateNavigationState();
-    loadUserPreferences();
-}
-
-// Check if user is logged in
-function checkUserSession() {
-    try {
-        const userData = localStorage.getItem('vatax_user');
-        const sessionToken = localStorage.getItem('vatax_session');
-        
-        if (userData && sessionToken) {
-            VATAX.currentUser = JSON.parse(userData);
-            VATAX.userSession = sessionToken;
-            VATAX.isProUser = VATAX.currentUser.subscription_status === 'pro';
-            updateUIForLoggedInUser();
-        } else {
-            updateUIForGuestUser();
-        }
-    } catch (error) {
-        console.error('Session check error:', error);
-        updateUIForGuestUser();
+    
+    // Initialize calculators based on current page
+    if (window.location.pathname.includes('vat-calculator.html') || document.getElementById('vat-calculator-section')) {
+        setTimeout(initializeVATCalculator, 100);
+    }
+    if (window.location.pathname.includes('tax-calculator.html') || document.getElementById('tax-calculator-section')) {
+        setTimeout(initializeTaxCalculator, 100);
+    }
+    if (window.location.pathname.includes('pricing.html') || document.getElementById('pricing-section')) {
+        setTimeout(initializePricingPage, 100);
+    }
+    if (window.location.pathname.includes('dashboard.html') || document.getElementById('dashboard-content')) {
+        setTimeout(initializeDashboard, 100);
     }
 }
 
-// Update navigation state based on user login
-function updateNavigationState() {
-    const authButtons = document.getElementById('auth-buttons');
-    const userMenu = document.getElementById('user-menu');
-    
-    if (VATAX.currentUser) {
-        if (authButtons) authButtons.style.display = 'none';
-        if (userMenu) {
-            userMenu.style.display = 'block';
-            const userName = document.getElementById('user-name');
-            if (userName) userName.textContent = VATAX.currentUser.name;
-        }
-    } else {
-        if (authButtons) authButtons.style.display = 'block';
-        if (userMenu) userMenu.style.display = 'none';
-    }
-}
-
-// Update UI for logged in user
-function updateUIForLoggedInUser() {
-    if (VATAX.isProUser) {
-        enableProFeatures();
-    } else {
-        disableProFeatures();
-    }
-    updateUserDashboardData();
-}
-
-// Update UI for guest user
-function updateUIForGuestUser() {
-    disableProFeatures();
-    showFreePlanLimits();
-}
-
-// Enable pro features
-function enableProFeatures() {
-    const proFeatureButtons = document.querySelectorAll('[data-pro="true"]');
-    proFeatureButtons.forEach(button => {
-        button.disabled = false;
-        button.style.opacity = '1';
-    });
-    
-    const proSections = document.querySelectorAll('.pro-feature');
-    proSections.forEach(section => {
-        section.style.display = 'block';
-    });
-}
-
-// Disable pro features
-function disableProFeatures() {
-    const proFeatureButtons = document.querySelectorAll('[data-pro="true"]');
-    proFeatureButtons.forEach(button => {
-        button.disabled = true;
-        button.style.opacity = '0.5';
-    });
-    
-    const proSections = document.querySelectorAll('.pro-feature');
-    proSections.forEach(section => {
-        section.style.display = 'none';
-    });
-}
-
-// Setup Event Listeners
-function setupEventListeners() {
-    // Mobile menu toggle
-    const mobileMenuButton = document.querySelector('.mobile-menu-button');
-    if (mobileMenuButton) {
-        mobileMenuButton.addEventListener('click', toggleMobileMenu);
-    }
-    
-    // User dropdown
-    const userDropdownBtn = document.getElementById('user-dropdown-btn');
-    if (userDropdownBtn) {
-        userDropdownBtn.addEventListener('click', toggleUserDropdown);
-    }
-    
-    // Close dropdowns when clicking outside
-    document.addEventListener('click', function(event) {
-        closeDropdownsOnOutsideClick(event);
-    });
-    
-    // Form submissions
-    setupFormListeners();
-}
-
-// Setup form listeners
-function setupFormListeners() {
-    const loginForm = document.getElementById('login-form');
-    if (loginForm) {
-        loginForm.addEventListener('submit', handleLogin);
-    }
-    
-    const signupForm = document.getElementById('signup-form');
-    if (signupForm) {
-        signupForm.addEventListener('submit', handleSignup);
-    }
-}
-
-// Initialize Modal functionality
-function initializeModals() {
-    const modals = document.querySelectorAll('.modal');
-    modals.forEach(modal => {
-        modal.addEventListener('click', function(event) {
-            if (event.target === modal) {
-                closeModal(modal.id);
-            }
-        });
-    });
-}
-
-// Authentication Functions
+// Authentication Functions - FIXED
 async function handleLogin(event) {
     if (event) event.preventDefault();
     
@@ -171,38 +50,54 @@ async function handleLogin(event) {
         return;
     }
     
-    showLoadingSpinner('login-form');
+    // Show loading
+    const submitBtn = document.querySelector('#login-form button[type="submit"]');
+    if (submitBtn) {
+        submitBtn.innerHTML = 'Logging in...';
+        submitBtn.disabled = true;
+    }
     
     try {
-        const response = await simulateLogin(email, password);
+        // Simulate API call
+        await new Promise(resolve => setTimeout(resolve, 1000));
         
-        if (response.success) {
-            localStorage.setItem('vatax_user', JSON.stringify(response.user));
-            localStorage.setItem('vatax_session', response.sessionToken);
-            
-            VATAX.currentUser = response.user;
-            VATAX.userSession = response.sessionToken;
-            VATAX.isProUser = response.user.subscription_status === 'pro';
-            
-            updateNavigationState();
-            updateUIForLoggedInUser();
-            
-            closeModal('login-modal');
-            showAlert('Login successful! Welcome back.', 'success');
-            
-            if (window.location.pathname === '/' || window.location.pathname.includes('index.html')) {
-                setTimeout(() => {
-                    window.location.href = 'dashboard.html';
-                }, 1000);
-            }
-        } else {
-            showAlert(response.message || 'Login failed. Please try again.', 'error');
-        }
+        // Demo login - always success for testing
+        const userData = {
+            id: 'user_' + Date.now(),
+            name: email.split('@')[0],
+            email: email,
+            subscription_status: 'free',
+            subscription_plan: null,
+            subscription_expires: null,
+            profile_completed: true,
+            email_verified: true
+        };
+        
+        localStorage.setItem('vatax_user', JSON.stringify(userData));
+        localStorage.setItem('vatax_session', 'session_' + Date.now());
+        
+        VATAX.currentUser = userData;
+        VATAX.userSession = 'session_' + Date.now();
+        VATAX.isProUser = false;
+        
+        updateNavigationState();
+        updateUIForLoggedInUser();
+        
+        closeModal('login-modal');
+        showAlert('Login successful! Welcome to VATAX.', 'success');
+        
+        // Redirect to dashboard
+        setTimeout(() => {
+            window.location.href = 'dashboard.html';
+        }, 1000);
+        
     } catch (error) {
-        console.error('Login error:', error);
-        showAlert('An error occurred during login. Please try again.', 'error');
+        showAlert('Login failed. Please try again.', 'error');
     } finally {
-        hideLoadingSpinner('login-form');
+        if (submitBtn) {
+            submitBtn.innerHTML = 'Login';
+            submitBtn.disabled = false;
+        }
     }
 }
 
@@ -224,80 +119,17 @@ async function handleSignup(event) {
         return;
     }
     
-    showLoadingSpinner('signup-form');
+    // Show loading
+    const submitBtn = document.querySelector('#signup-form button[type="submit"]');
+    if (submitBtn) {
+        submitBtn.innerHTML = 'Creating Account...';
+        submitBtn.disabled = true;
+    }
     
     try {
-        const response = await simulateSignup(name, email, password);
+        await new Promise(resolve => setTimeout(resolve, 1000));
         
-        if (response.success) {
-            localStorage.setItem('vatax_user', JSON.stringify(response.user));
-            localStorage.setItem('vatax_session', response.sessionToken);
-            
-            VATAX.currentUser = response.user;
-            VATAX.userSession = response.sessionToken;
-            VATAX.isProUser = false;
-            
-            updateNavigationState();
-            updateUIForLoggedInUser();
-            
-            closeModal('signup-modal');
-            showAlert('Account created successfully! Welcome to VATAX.', 'success');
-            
-            setTimeout(() => {
-                window.location.href = 'dashboard.html';
-            }, 1000);
-        } else {
-            showAlert(response.message || 'Signup failed. Please try again.', 'error');
-        }
-    } catch (error) {
-        console.error('Signup error:', error);
-        showAlert('An error occurred during registration. Please try again.', 'error');
-    } finally {
-        hideLoadingSpinner('signup-form');
-    }
-}
-
-// Simulate login API call
-async function simulateLogin(email, password) {
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    if (email === 'demo@example.com' && password === 'demo123') {
-        return {
-            success: true,
-            user: {
-                id: 'user_001',
-                name: 'Demo User',
-                email: email,
-                subscription_status: 'pro',
-                subscription_plan: 'monthly',
-                subscription_expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-                profile_completed: true,
-                email_verified: true
-            },
-            sessionToken: 'session_' + Date.now()
-        };
-    }
-    
-    return {
-        success: false,
-        message: 'Invalid email or password'
-    };
-}
-
-// Simulate signup API call
-async function simulateSignup(name, email, password) {
-    await new Promise(resolve => setTimeout(resolve, 1200));
-    
-    if (email === 'demo@example.com') {
-        return {
-            success: false,
-            message: 'Email already exists'
-        };
-    }
-    
-    return {
-        success: true,
-        user: {
+        const userData = {
             id: 'user_' + Date.now(),
             name: name,
             email: email,
@@ -306,286 +138,47 @@ async function simulateSignup(name, email, password) {
             subscription_expires: null,
             profile_completed: false,
             email_verified: false
-        },
-        sessionToken: 'session_' + Date.now()
-    };
-}
-
-// Logout function
-function logout() {
-    localStorage.removeItem('vatax_user');
-    localStorage.removeItem('vatax_session');
-    
-    VATAX.currentUser = null;
-    VATAX.userSession = null;
-    VATAX.isProUser = false;
-    
-    updateUIForGuestUser();
-    updateNavigationState();
-    
-    showAlert('You have been logged out successfully.', 'info');
-    
-    if (window.location.pathname.includes('dashboard.html')) {
-        window.location.href = 'index.html';
-    }
-}
-
-// Modal functions
-function showLogin() {
-    showModal('login-modal');
-}
-
-function showSignup() {
-    showModal('signup-modal');
-}
-
-function showModal(modalId) {
-    const modal = document.getElementById(modalId);
-    if (modal) {
-        modal.style.display = 'block';
-        document.body.style.overflow = 'hidden';
-    }
-}
-
-function closeModal(modalId) {
-    const modal = document.getElementById(modalId);
-    if (modal) {
-        modal.style.display = 'none';
-        document.body.style.overflow = 'auto';
-    }
-}
-
-// Navigation functions
-function toggleMobileMenu() {
-    const mobileMenu = document.getElementById('mobile-menu');
-    if (mobileMenu) {
-        mobileMenu.style.display = mobileMenu.style.display === 'none' ? 'block' : 'none';
-    }
-}
-
-function toggleUserDropdown() {
-    const dropdownMenu = document.getElementById('dropdown-menu');
-    if (dropdownMenu) {
-        dropdownMenu.style.display = dropdownMenu.style.display === 'none' ? 'block' : 'none';
-    }
-}
-
-function closeDropdownsOnOutsideClick(event) {
-    const userDropdown = document.getElementById('dropdown-menu');
-    const userButton = document.getElementById('user-dropdown-btn');
-    
-    if (userDropdown && userButton && !userDropdown.contains(event.target) && !userButton.contains(event.target)) {
-        userDropdown.style.display = 'none';
-    }
-}
-
-// Utility functions
-function showAlert(message, type = 'info') {
-    // Remove existing alerts
-    const existingAlerts = document.querySelectorAll('.alert');
-    existingAlerts.forEach(alert => alert.remove());
-    
-    const alert = document.createElement('div');
-    alert.className = `alert alert-${type}`;
-    alert.innerHTML = `
-        <div style="display: flex; align-items: center; padding: 12px; background: ${getAlertColor(type)}; color: white; border-radius: 4px; margin: 10px; max-width: 400px;">
-            <span>${message}</span>
-            <button onclick="this.parentElement.parentElement.remove()" style="margin-left: auto; background: none; border: none; color: white; font-size: 20px; cursor: pointer;">×</button>
-        </div>
-    `;
-    
-    alert.style.position = 'fixed';
-    alert.style.top = '20px';
-    alert.style.right = '20px';
-    alert.style.zIndex = '1000';
-    
-    document.body.appendChild(alert);
-    
-    setTimeout(() => {
-        if (alert.parentElement) {
-            alert.remove();
-        }
-    }, 5000);
-}
-
-function getAlertColor(type) {
-    const colors = {
-        success: '#10B981',
-        error: '#EF4444',
-        warning: '#F59E0B',
-        info: '#3B82F6'
-    };
-    return colors[type] || '#3B82F6';
-}
-
-function showLoadingSpinner(formId) {
-    const form = document.getElementById(formId);
-    const submitButton = form?.querySelector('button[type="submit"]');
-    
-    if (submitButton) {
-        submitButton.disabled = true;
-        submitButton.innerHTML = 'Loading...';
-    }
-}
-
-function hideLoadingSpinner(formId) {
-    const form = document.getElementById(formId);
-    const submitButton = form?.querySelector('button[type="submit"]');
-    
-    if (submitButton) {
-        submitButton.disabled = false;
-        if (formId === 'login-form') {
-            submitButton.innerHTML = 'Login';
-        } else if (formId === 'signup-form') {
-            submitButton.innerHTML = 'Create Account';
-        }
-    }
-}
-
-// Format currency
-function formatCurrency(amount) {
-    return new Intl.NumberFormat('en-BD', {
-        style: 'currency',
-        currency: 'BDT',
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 2
-    }).format(amount).replace('BDT', '৳');
-}
-
-// Format number with commas
-function formatNumber(number) {
-    return new Intl.NumberFormat('en-BD').format(number);
-}
-
-// Load user preferences
-function loadUserPreferences() {
-    try {
-        const preferences = localStorage.getItem('vatax_preferences');
-        if (preferences) {
-            const prefs = JSON.parse(preferences);
-            applyThemePreferences(prefs);
-        }
-    } catch (error) {
-        console.error('Error loading preferences:', error);
-    }
-}
-
-function applyThemePreferences(preferences) {
-    if (preferences.theme === 'dark') {
-        document.body.classList.add('dark');
-    }
-}
-
-// Update dashboard data
-function updateUserDashboardData() {
-    if (window.location.pathname.includes('dashboard.html')) {
-        loadDashboardData();
-    }
-}
-
-async function loadDashboardData() {
-    try {
-        const calculations = await loadUserCalculations();
-        const stats = await loadUserStatistics();
-        updateDashboardStats(stats);
-        updateRecentCalculations(calculations);
-    } catch (error) {
-        console.error('Error loading dashboard data:', error);
-    }
-}
-
-async function loadUserCalculations() {
-    return [
-        {
-            id: 'calc_001',
-            type: 'vat',
-            baseAmount: 50000,
-            vatRate: 15,
-            totalAmount: 57500,
-            date: new Date().toISOString(),
-            saved: true
-        }
-    ];
-}
-
-async function loadUserStatistics() {
-    return {
-        totalCalculations: 247,
-        vatCalculations: 156,
-        taxCalculations: 91,
-        reportsGenerated: 23
-    };
-}
-
-function updateDashboardStats(stats) {
-    const elements = {
-        'total-calculations': stats.totalCalculations,
-        'vat-calculations': stats.vatCalculations,
-        'tax-calculations': stats.taxCalculations,
-        'reports-generated': stats.reportsGenerated
-    };
-    
-    Object.entries(elements).forEach(([id, value]) => {
-        const element = document.getElementById(id);
-        if (element) {
-            element.textContent = formatNumber(value);
-        }
-    });
-}
-
-function updateRecentCalculations(calculations) {
-    const tableBody = document.getElementById('calculations-table-body');
-    if (!tableBody) return;
-    
-    tableBody.innerHTML = calculations.map(calc => `
-        <tr>
-            <td>
-                <div style="display: flex; align-items: center;">
-                    ${calc.type === 'vat' ? 'VAT' : 'Income Tax'}
-                </div>
-            </td>
-            <td>${formatCurrency(calc.baseAmount)}</td>
-            <td style="font-weight: 600;">${formatCurrency(calc.totalAmount || calc.baseAmount + calc.taxAmount)}</td>
-            <td>${new Date(calc.date).toLocaleDateString()}</td>
-            <td>
-                <div style="display: flex; gap: 8px;">
-                    <button class="view-btn" title="View Details">View</button>
-                </div>
-            </td>
-        </tr>
-    `).join('');
-}
-
-// Show free plan limits
-function showFreePlanLimits() {
-    const calculationCount = parseInt(localStorage.getItem('vatax_free_calculations') || '0');
-    
-    if (calculationCount >= VATAX.config.maxFreeCalculations) {
-        showAlert('You have reached the limit of free calculations. Upgrade to Pro for unlimited access.', 'warning');
-    }
-}
-
-// Track free calculations
-function trackFreeCalculation() {
-    if (!VATAX.currentUser || VATAX.currentUser.subscription_status === 'free') {
-        const currentCount = parseInt(localStorage.getItem('vatax_free_calculations') || '0');
-        localStorage.setItem('vatax_free_calculations', (currentCount + 1).toString());
+        };
         
-        if (currentCount + 1 >= VATAX.config.maxFreeCalculations) {
-            showAlert('You have reached your free calculation limit. Upgrade to Pro for unlimited calculations.', 'warning');
+        localStorage.setItem('vatax_user', JSON.stringify(userData));
+        localStorage.setItem('vatax_session', 'session_' + Date.now());
+        
+        VATAX.currentUser = userData;
+        VATAX.userSession = 'session_' + Date.now();
+        VATAX.isProUser = false;
+        
+        updateNavigationState();
+        updateUIForLoggedInUser();
+        
+        closeModal('signup-modal');
+        showAlert('Account created successfully! Welcome to VATAX.', 'success');
+        
+        setTimeout(() => {
+            window.location.href = 'dashboard.html';
+        }, 1000);
+        
+    } catch (error) {
+        showAlert('Signup failed. Please try again.', 'error');
+    } finally {
+        if (submitBtn) {
+            submitBtn.innerHTML = 'Create Account';
+            submitBtn.disabled = false;
         }
     }
 }
 
-// Quick calculator functions for homepage
+// Calculator Functions - FIXED
 function calculateQuickVAT() {
     const amountInput = document.getElementById('quick-vat-amount');
     const rateInput = document.getElementById('quick-vat-rate');
     
-    if (!amountInput || !rateInput) return;
+    if (!amountInput || !rateInput) {
+        showAlert('Calculator elements not found', 'error');
+        return;
+    }
     
     const amount = parseFloat(amountInput.value);
-    const rate = parseFloat(rateInput.value);
+    const rate = parseFloat(rateInput.value) || 15;
     
     if (isNaN(amount) || amount <= 0) {
         showAlert('Please enter a valid amount', 'warning');
@@ -595,6 +188,7 @@ function calculateQuickVAT() {
     const vatAmount = (amount * rate) / 100;
     const total = amount + vatAmount;
     
+    // Update results - FIXED SELECTORS
     const amountResult = document.getElementById('quick-vat-amount-result');
     const totalResult = document.getElementById('quick-vat-total-result');
     const resultDiv = document.getElementById('quick-vat-result');
@@ -603,7 +197,7 @@ function calculateQuickVAT() {
     if (totalResult) totalResult.textContent = formatNumber(total);
     if (resultDiv) resultDiv.style.display = 'block';
     
-    trackFreeCalculation();
+    showAlert(`VAT calculated: ৳${formatNumber(vatAmount)}`, 'success');
 }
 
 function calculateQuickTax() {
@@ -617,104 +211,517 @@ function calculateQuickTax() {
         return;
     }
     
-    const taxCalculation = calculateIncomeTax(income, 'individual', '2024-25');
+    const tax = calculateIncomeTax(income);
     
     const taxableIncomeEl = document.getElementById('quick-taxable-income');
     const taxAmountEl = document.getElementById('quick-tax-amount');
     const resultDiv = document.getElementById('quick-tax-result');
     
-    if (taxableIncomeEl) taxableIncomeEl.textContent = formatNumber(taxCalculation.taxableIncome);
-    if (taxAmountEl) taxAmountEl.textContent = formatNumber(taxCalculation.totalTax);
+    if (taxableIncomeEl) taxableIncomeEl.textContent = formatNumber(tax.taxableIncome);
+    if (taxAmountEl) taxAmountEl.textContent = formatNumber(tax.totalTax);
     if (resultDiv) resultDiv.style.display = 'block';
     
-    trackFreeCalculation();
+    showAlert(`Tax calculated: ৳${formatNumber(tax.totalTax)}`, 'success');
 }
 
-// Basic income tax calculation function
-function calculateIncomeTax(income, category = 'individual', year = '2024-25') {
-    const taxSlabs = {
-        individual: [
-            { min: 0, max: 350000, rate: 0 },
-            { min: 350000, max: 450000, rate: 5 },
-            { min: 450000, max: 750000, rate: 10 },
-            { min: 750000, max: 1150000, rate: 15 },
-            { min: 1150000, max: 1650000, rate: 20 },
-            { min: 1650000, max: Infinity, rate: 25 }
-        ]
-    };
+// VAT Calculator Functions - FIXED
+function initializeVATCalculator() {
+    console.log('Initializing VAT Calculator...');
     
-    const slabs = taxSlabs[category] || taxSlabs.individual;
-    let totalTax = 0;
-    let remainingIncome = income;
+    // Set up event listeners
+    const baseAmountInput = document.getElementById('base-amount');
+    const vatRateSelect = document.getElementById('vat-rate');
     
-    for (const slab of slabs) {
-        if (remainingIncome <= 0) break;
-        
-        const taxableInThisSlab = Math.min(remainingIncome, slab.max - slab.min);
-        const taxForThisSlab = (taxableInThisSlab * slab.rate) / 100;
-        
-        totalTax += taxForThisSlab;
-        remainingIncome -= taxableInThisSlab;
-        
-        if (income <= slab.max) break;
+    if (baseAmountInput) {
+        baseAmountInput.addEventListener('input', function() {
+            setTimeout(calculateVAT, 300);
+        });
     }
     
-    return {
-        taxableIncome: income,
-        totalTax: Math.round(totalTax),
-        effectiveRate: income > 0 ? (totalTax / income) * 100 : 0
-    };
+    if (vatRateSelect) {
+        vatRateSelect.addEventListener('change', calculateVAT);
+    }
+    
+    // Set up calculation type radios
+    const calcTypeRadios = document.querySelectorAll('input[name="calculation-type"]');
+    calcTypeRadios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            updateVATAmountLabel();
+            calculateVAT();
+        });
+    });
+    
+    updateVATAmountLabel();
+    
+    // Test calculation
+    setTimeout(() => {
+        if (baseAmountInput && !baseAmountInput.value) {
+            baseAmountInput.value = '1000';
+            calculateVAT();
+        }
+    }, 500);
 }
 
-// Netlify-specific fixes for SPA routing
-function setupSPARouting() {
-    // Handle internal links for SPA behavior
-    document.addEventListener('click', function(e) {
-        const link = e.target.closest('a');
-        if (link && link.href && link.href.startsWith(window.location.origin)) {
+function calculateVAT() {
+    const baseAmountInput = document.getElementById('base-amount');
+    const vatRateSelect = document.getElementById('vat-rate');
+    const customRateInput = document.getElementById('custom-rate');
+    
+    if (!baseAmountInput || !vatRateSelect) return;
+    
+    const baseAmount = parseFloat(baseAmountInput.value);
+    if (isNaN(baseAmount) || baseAmount <= 0) {
+        hideVATResults();
+        return;
+    }
+    
+    // Get VAT rate
+    let vatRate;
+    if (vatRateSelect.value === 'custom') {
+        if (!customRateInput) return;
+        vatRate = parseFloat(customRateInput.value);
+        if (isNaN(vatRate)) {
+            showAlert('Please enter a valid custom VAT rate', 'error');
+            return;
+        }
+    } else {
+        vatRate = parseFloat(vatRateSelect.value);
+    }
+    
+    if (isNaN(vatRate) || vatRate < 0) {
+        showAlert('Please select a valid VAT rate', 'error');
+        return;
+    }
+    
+    // Get calculation type
+    const calcType = document.querySelector('input[name="calculation-type"]:checked');
+    if (!calcType) return;
+    
+    let vatAmount, totalAmount, actualBaseAmount;
+    
+    if (calcType.value === 'inclusive') {
+        // Total amount includes VAT
+        actualBaseAmount = baseAmount / (1 + (vatRate / 100));
+        vatAmount = baseAmount - actualBaseAmount;
+        totalAmount = baseAmount;
+    } else {
+        // Base amount excludes VAT
+        actualBaseAmount = baseAmount;
+        vatAmount = (baseAmount * vatRate) / 100;
+        totalAmount = baseAmount + vatAmount;
+    }
+    
+    // Display results
+    displayVATResults(actualBaseAmount, vatRate, vatAmount, totalAmount);
+    showAlert('VAT calculated successfully!', 'success');
+}
+
+function displayVATResults(baseAmount, vatRate, vatAmount, totalAmount) {
+    const resultsPanel = document.getElementById('calculation-results');
+    const noResults = document.getElementById('no-results');
+    
+    if (resultsPanel && noResults) {
+        resultsPanel.style.display = 'block';
+        noResults.style.display = 'none';
+    }
+    
+    // Update result values
+    const baseEl = document.getElementById('result-base');
+    const rateEl = document.getElementById('result-rate');
+    const vatEl = document.getElementById('result-vat');
+    const totalEl = document.getElementById('result-total');
+    
+    if (baseEl) baseEl.textContent = formatNumber(Math.round(baseAmount));
+    if (rateEl) rateEl.textContent = vatRate;
+    if (vatEl) vatEl.textContent = formatNumber(Math.round(vatAmount));
+    if (totalEl) totalEl.textContent = formatNumber(Math.round(totalAmount));
+}
+
+function hideVATResults() {
+    const resultsPanel = document.getElementById('calculation-results');
+    const noResults = document.getElementById('no-results');
+    
+    if (resultsPanel && noResults) {
+        resultsPanel.style.display = 'none';
+        noResults.style.display = 'block';
+    }
+}
+
+function updateVATAmountLabel() {
+    const calcType = document.querySelector('input[name="calculation-type"]:checked');
+    const amountLabel = document.getElementById('amount-label');
+    
+    if (calcType && amountLabel) {
+        if (calcType.value === 'inclusive') {
+            amountLabel.textContent = 'Total Amount (৳)';
+        } else {
+            amountLabel.textContent = 'Base Amount (৳)';
+        }
+    }
+}
+
+// Tax Calculator Functions - FIXED
+function initializeTaxCalculator() {
+    console.log('Initializing Tax Calculator...');
+    
+    // Set up event listeners for all income inputs
+    const incomeInputs = ['salary-income', 'business-income', 'rental-income', 'other-income'];
+    incomeInputs.forEach(id => {
+        const input = document.getElementById(id);
+        if (input) {
+            input.addEventListener('input', function() {
+                setTimeout(calculateTax, 300);
+            });
+        }
+    });
+    
+    // Set up deduction inputs
+    const deductionInputs = ['investment-deduction', 'zakat-deduction', 'donation-deduction', 'other-deduction'];
+    deductionInputs.forEach(id => {
+        const input = document.getElementById(id);
+        if (input) {
+            input.addEventListener('input', function() {
+                setTimeout(calculateTax, 300);
+            });
+        }
+    });
+    
+    // Set up tax year and category
+    const taxYearSelect = document.getElementById('tax-year');
+    const categoryRadios = document.querySelectorAll('input[name="taxpayer-category"]');
+    
+    if (taxYearSelect) {
+        taxYearSelect.addEventListener('change', calculateTax);
+    }
+    
+    categoryRadios.forEach(radio => {
+        radio.addEventListener('change', calculateTax);
+    });
+    
+    // Test calculation
+    setTimeout(() => {
+        const salaryInput = document.getElementById('salary-income');
+        if (salaryInput && !salaryInput.value) {
+            salaryInput.value = '500000';
+            calculateTax();
+        }
+    }, 500);
+}
+
+function calculateTax() {
+    // Get income values
+    const salary = parseFloat(document.getElementById('salary-income')?.value) || 0;
+    const business = parseFloat(document.getElementById('business-income')?.value) || 0;
+    const rental = parseFloat(document.getElementById('rental-income')?.value) || 0;
+    const other = parseFloat(document.getElementById('other-income')?.value) || 0;
+    
+    const totalIncome = salary + business + rental + other;
+    if (totalIncome <= 0) {
+        hideTaxResults();
+        return;
+    }
+    
+    // Get deduction values
+    const investment = parseFloat(document.getElementById('investment-deduction')?.value) || 0;
+    const zakat = parseFloat(document.getElementById('zakat-deduction')?.value) || 0;
+    const donation = parseFloat(document.getElementById('donation-deduction')?.value) || 0;
+    const otherDeduction = parseFloat(document.getElementById('other-deduction')?.value) || 0;
+    
+    const totalDeductions = investment + zakat + donation + otherDeduction;
+    const taxableIncome = Math.max(0, totalIncome - totalDeductions);
+    
+    // Calculate tax
+    const taxResult = calculateIncomeTax(taxableIncome);
+    
+    // Display results
+    displayTaxResults(totalIncome, totalDeductions, taxableIncome, taxResult.totalTax);
+    showAlert('Tax calculated successfully!', 'success');
+}
+
+function displayTaxResults(totalIncome, deductions, taxableIncome, taxLiability) {
+    const resultsPanel = document.getElementById('tax-calculation-results');
+    const noResults = document.getElementById('no-tax-results');
+    
+    if (resultsPanel && noResults) {
+        resultsPanel.style.display = 'block';
+        noResults.style.display = 'none';
+    }
+    
+    // Update result values
+    const totalIncomeEl = document.getElementById('tax-result-total-income');
+    const deductionsEl = document.getElementById('tax-result-deductions');
+    const taxableEl = document.getElementById('tax-result-taxable');
+    const liabilityEl = document.getElementById('tax-result-liability');
+    const monthlyEl = document.getElementById('monthly-tax');
+    
+    if (totalIncomeEl) totalIncomeEl.textContent = formatNumber(totalIncome);
+    if (deductionsEl) deductionsEl.textContent = formatNumber(deductions);
+    if (taxableEl) taxableEl.textContent = formatNumber(taxableIncome);
+    if (liabilityEl) liabilityEl.textContent = formatNumber(taxLiability);
+    if (monthlyEl) monthlyEl.textContent = formatNumber(Math.round(taxLiability / 12));
+}
+
+function hideTaxResults() {
+    const resultsPanel = document.getElementById('tax-calculation-results');
+    const noResults = document.getElementById('no-tax-results');
+    
+    if (resultsPanel && noResults) {
+        resultsPanel.style.display = 'none';
+        noResults.style.display = 'block';
+    }
+}
+
+// Pricing Page Functions - FIXED
+function initializePricingPage() {
+    console.log('Initializing Pricing Page...');
+    
+    // Set up billing toggle
+    const billingToggle = document.getElementById('billing-toggle');
+    if (billingToggle) {
+        billingToggle.addEventListener('change', function() {
+            updatePricingDisplay(this.checked);
+        });
+    }
+    
+    // Set up upgrade buttons
+    const upgradeButtons = document.querySelectorAll('.pro-plan-btn, [onclick*="upgradeToPro"]');
+    upgradeButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
             e.preventDefault();
-            const path = new URL(link.href).pathname;
-            navigateTo(path);
+            upgradeToPro();
+        });
+    });
+    
+    // Initialize pricing display
+    updatePricingDisplay(false);
+}
+
+function updatePricingDisplay(isYearly) {
+    const monthlyPrice = document.getElementById('pro-price');
+    const periodText = document.getElementById('pro-period');
+    const savingsBadge = document.getElementById('yearly-savings');
+    
+    if (monthlyPrice && periodText) {
+        if (isYearly) {
+            monthlyPrice.textContent = '83';
+            periodText.textContent = '/month';
+            if (savingsBadge) {
+                savingsBadge.style.display = 'inline-block';
+            }
+        } else {
+            monthlyPrice.textContent = '99';
+            periodText.textContent = '/month';
+            if (savingsBadge) {
+                savingsBadge.style.display = 'none';
+            }
+        }
+    }
+}
+
+function upgradeToPro() {
+    if (!VATAX.currentUser) {
+        showAlert('Please login first to upgrade to Pro', 'warning');
+        showLogin();
+        return;
+    }
+    
+    showAlert('Redirecting to payment...', 'info');
+    
+    // Simulate payment process
+    setTimeout(() => {
+        VATAX.currentUser.subscription_status = 'pro';
+        VATAX.isProUser = true;
+        localStorage.setItem('vatax_user', JSON.stringify(VATAX.currentUser));
+        
+        showAlert('🎉 Welcome to VATAX Pro! All features unlocked.', 'success');
+        
+        // Reload to update UI
+        setTimeout(() => {
+            window.location.reload();
+        }, 2000);
+    }, 1500);
+}
+
+// FAQ Functions - FIXED
+function initializeFAQ() {
+    const faqItems = document.querySelectorAll('.faq-item');
+    faqItems.forEach(item => {
+        const question = item.querySelector('.faq-question');
+        if (question) {
+            question.addEventListener('click', function() {
+                const answer = item.querySelector('.faq-answer');
+                const icon = question.querySelector('i');
+                
+                if (answer.style.display === 'block') {
+                    answer.style.display = 'none';
+                    if (icon) icon.className = 'fas fa-plus';
+                } else {
+                    answer.style.display = 'block';
+                    if (icon) icon.className = 'fas fa-minus';
+                }
+            });
         }
     });
 }
 
-function navigateTo(path) {
-    // Simple SPA navigation
-    window.history.pushState({}, '', path);
-    loadPageContent(path);
+// Utility Functions
+function showAlert(message, type = 'info') {
+    // Remove existing alerts
+    const existingAlerts = document.querySelectorAll('.custom-alert');
+    existingAlerts.forEach(alert => alert.remove());
+    
+    const alert = document.createElement('div');
+    alert.className = `custom-alert alert-${type}`;
+    alert.innerHTML = `
+        <div style="
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 16px;
+            background: ${type === 'success' ? '#10B981' : type === 'error' ? '#EF4444' : type === 'warning' ? '#F59E0B' : '#3B82F6'};
+            color: white;
+            border-radius: 8px;
+            z-index: 10000;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            max-width: 300px;
+        ">
+            ${message}
+            <button onclick="this.parentElement.parentElement.remove()" style="
+                background: none;
+                border: none;
+                color: white;
+                margin-left: 10px;
+                cursor: pointer;
+                float: right;
+            ">×</button>
+        </div>
+    `;
+    
+    document.body.appendChild(alert);
+    
+    setTimeout(() => {
+        if (alert.parentElement) {
+            alert.remove();
+        }
+    }, 4000);
 }
 
-function loadPageContent(path) {
-    // Simple content loading for SPA
-    const mainContent = document.getElementById('main-content');
-    if (mainContent) {
-        mainContent.innerHTML = `<div style="padding: 20px; text-align: center;">Loading ${path}...</div>`;
+function formatNumber(number) {
+    return new Intl.NumberFormat('en-BD').format(number);
+}
+
+function showLogin() {
+    const modal = document.getElementById('login-modal');
+    if (modal) modal.style.display = 'block';
+}
+
+function showSignup() {
+    const modal = document.getElementById('signup-modal');
+    if (modal) modal.style.display = 'block';
+}
+
+function closeModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) modal.style.display = 'none';
+}
+
+function logout() {
+    localStorage.removeItem('vatax_user');
+    localStorage.removeItem('vatax_session');
+    VATAX.currentUser = null;
+    VATAX.isProUser = false;
+    
+    showAlert('Logged out successfully', 'info');
+    setTimeout(() => {
+        window.location.href = 'index.html';
+    }, 1000);
+}
+
+// Basic income tax calculation
+function calculateIncomeTax(income, category = 'individual') {
+    const slabs = [
+        { min: 0, max: 350000, rate: 0 },
+        { min: 350000, max: 450000, rate: 5 },
+        { min: 450000, max: 750000, rate: 10 },
+        { min: 750000, max: 1150000, rate: 15 },
+        { min: 1150000, max: 1650000, rate: 20 },
+        { min: 1650000, max: Infinity, rate: 25 }
+    ];
+    
+    let tax = 0;
+    let remaining = income;
+    
+    for (const slab of slabs) {
+        if (remaining <= 0) break;
         
-        // Simulate content loading
-        setTimeout(() => {
-            if (path.includes('dashboard')) {
-                initializeDashboard();
-            } else if (path.includes('vat-calculator')) {
-                initializeVATCalculator();
-            } else if (path.includes('tax-calculator')) {
-                initializeTaxCalculator();
-            }
-        }, 300);
+        const taxable = Math.min(remaining, slab.max - slab.min);
+        tax += (taxable * slab.rate) / 100;
+        remaining -= taxable;
+    }
+    
+    return {
+        taxableIncome: income,
+        totalTax: Math.round(tax),
+        effectiveRate: income > 0 ? (tax / income) * 100 : 0
+    };
+}
+
+// Navigation functions
+function updateNavigationState() {
+    const authSection = document.getElementById('auth-buttons');
+    const userSection = document.getElementById('user-menu');
+    
+    if (VATAX.currentUser) {
+        if (authSection) authSection.style.display = 'none';
+        if (userSection) {
+            userSection.style.display = 'block';
+            const userName = document.getElementById('user-name');
+            if (userName) userName.textContent = VATAX.currentUser.name;
+        }
+    } else {
+        if (authSection) authSection.style.display = 'block';
+        if (userSection) userSection.style.display = 'none';
     }
 }
 
-// Initialize SPA routing
+function updateUIForLoggedInUser() {
+    // Enable pro features if user is pro
+    if (VATAX.isProUser) {
+        document.querySelectorAll('.pro-feature').forEach(el => {
+            el.style.opacity = '1';
+            el.style.pointerEvents = 'auto';
+        });
+    }
+}
+
+function checkUserSession() {
+    try {
+        const userData = localStorage.getItem('vatax_user');
+        if (userData) {
+            VATAX.currentUser = JSON.parse(userData);
+            VATAX.isProUser = VATAX.currentUser.subscription_status === 'pro';
+            updateNavigationState();
+            updateUIForLoggedInUser();
+        }
+    } catch (error) {
+        console.error('Error checking session:', error);
+    }
+}
+
+// Initialize everything when page loads
 document.addEventListener('DOMContentLoaded', function() {
-    setupSPARouting();
+    initializeApp();
+    initializeFAQ();
 });
 
-// Export functions to global scope
+// Global exports
+window.calculateQuickVAT = calculateQuickVAT;
+window.calculateQuickTax = calculateQuickTax;
+window.calculateVAT = calculateVAT;
+window.calculateTax = calculateTax;
 window.showLogin = showLogin;
 window.showSignup = showSignup;
 window.closeModal = closeModal;
 window.logout = logout;
-window.toggleMobileMenu = toggleMobileMenu;
-window.calculateQuickVAT = calculateQuickVAT;
-window.calculateQuickTax = calculateQuickTax;
+window.upgradeToPro = upgradeToPro;
 window.VATAX = window.VATAX || VATAX;
