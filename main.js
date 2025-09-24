@@ -1,5 +1,5 @@
 // VATAX - Main JavaScript File
-// Core functionality for authentication, navigation, and UI interactions
+// Netlify compatible fixes applied
 
 // Global state management
 window.VATAX = {
@@ -10,7 +10,7 @@ window.VATAX = {
     config: {
         appName: 'VATAX',
         version: '1.0.0',
-        apiBaseUrl: '/api',
+        apiBaseUrl: '/.netlify/functions/api',
         maxFreeCalculations: 5
     }
 };
@@ -31,15 +31,20 @@ function initializeApp() {
 
 // Check if user is logged in
 function checkUserSession() {
-    const userData = localStorage.getItem('vatax_user');
-    const sessionToken = localStorage.getItem('vatax_session');
-    
-    if (userData && sessionToken) {
-        VATAX.currentUser = JSON.parse(userData);
-        VATAX.userSession = sessionToken;
-        VATAX.isProUser = VATAX.currentUser.subscription_status === 'pro';
-        updateUIForLoggedInUser();
-    } else {
+    try {
+        const userData = localStorage.getItem('vatax_user');
+        const sessionToken = localStorage.getItem('vatax_session');
+        
+        if (userData && sessionToken) {
+            VATAX.currentUser = JSON.parse(userData);
+            VATAX.userSession = sessionToken;
+            VATAX.isProUser = VATAX.currentUser.subscription_status === 'pro';
+            updateUIForLoggedInUser();
+        } else {
+            updateUIForGuestUser();
+        }
+    } catch (error) {
+        console.error('Session check error:', error);
         updateUIForGuestUser();
     }
 }
@@ -50,28 +55,25 @@ function updateNavigationState() {
     const userMenu = document.getElementById('user-menu');
     
     if (VATAX.currentUser) {
-        if (authButtons) authButtons.classList.add('hidden');
+        if (authButtons) authButtons.style.display = 'none';
         if (userMenu) {
-            userMenu.classList.remove('hidden');
+            userMenu.style.display = 'block';
             const userName = document.getElementById('user-name');
             if (userName) userName.textContent = VATAX.currentUser.name;
         }
     } else {
-        if (authButtons) authButtons.classList.remove('hidden');
-        if (userMenu) userMenu.classList.add('hidden');
+        if (authButtons) authButtons.style.display = 'block';
+        if (userMenu) userMenu.style.display = 'none';
     }
 }
 
 // Update UI for logged in user
 function updateUIForLoggedInUser() {
-    // Enable pro features if user is pro
     if (VATAX.isProUser) {
         enableProFeatures();
     } else {
         disableProFeatures();
     }
-    
-    // Update user-specific content
     updateUserDashboardData();
 }
 
@@ -86,13 +88,12 @@ function enableProFeatures() {
     const proFeatureButtons = document.querySelectorAll('[data-pro="true"]');
     proFeatureButtons.forEach(button => {
         button.disabled = false;
-        button.classList.remove('opacity-50');
+        button.style.opacity = '1';
     });
     
-    // Show pro sections
     const proSections = document.querySelectorAll('.pro-feature');
     proSections.forEach(section => {
-        section.classList.remove('hidden');
+        section.style.display = 'block';
     });
 }
 
@@ -101,20 +102,19 @@ function disableProFeatures() {
     const proFeatureButtons = document.querySelectorAll('[data-pro="true"]');
     proFeatureButtons.forEach(button => {
         button.disabled = true;
-        button.classList.add('opacity-50');
+        button.style.opacity = '0.5';
     });
     
-    // Hide pro sections
     const proSections = document.querySelectorAll('.pro-feature');
     proSections.forEach(section => {
-        section.classList.add('hidden');
+        section.style.display = 'none';
     });
 }
 
 // Setup Event Listeners
 function setupEventListeners() {
     // Mobile menu toggle
-    const mobileMenuButton = document.querySelector('[onclick="toggleMobileMenu()"]');
+    const mobileMenuButton = document.querySelector('.mobile-menu-button');
     if (mobileMenuButton) {
         mobileMenuButton.addEventListener('click', toggleMobileMenu);
     }
@@ -136,13 +136,11 @@ function setupEventListeners() {
 
 // Setup form listeners
 function setupFormListeners() {
-    // Login form
     const loginForm = document.getElementById('login-form');
     if (loginForm) {
         loginForm.addEventListener('submit', handleLogin);
     }
     
-    // Signup form
     const signupForm = document.getElementById('signup-form');
     if (signupForm) {
         signupForm.addEventListener('submit', handleSignup);
@@ -151,7 +149,6 @@ function setupFormListeners() {
 
 // Initialize Modal functionality
 function initializeModals() {
-    // Close modal when clicking outside
     const modals = document.querySelectorAll('.modal');
     modals.forEach(modal => {
         modal.addEventListener('click', function(event) {
@@ -164,35 +161,35 @@ function initializeModals() {
 
 // Authentication Functions
 async function handleLogin(event) {
-    event.preventDefault();
+    if (event) event.preventDefault();
     
-    const email = document.getElementById('login-email').value;
-    const password = document.getElementById('login-password').value;
+    const email = document.getElementById('login-email')?.value;
+    const password = document.getElementById('login-password')?.value;
+    
+    if (!email || !password) {
+        showAlert('Please fill in all fields', 'error');
+        return;
+    }
     
     showLoadingSpinner('login-form');
     
     try {
-        // Simulate API call - replace with actual authentication
         const response = await simulateLogin(email, password);
         
         if (response.success) {
-            // Store user data
             localStorage.setItem('vatax_user', JSON.stringify(response.user));
             localStorage.setItem('vatax_session', response.sessionToken);
             
-            // Update global state
             VATAX.currentUser = response.user;
             VATAX.userSession = response.sessionToken;
             VATAX.isProUser = response.user.subscription_status === 'pro';
             
-            // Update UI
             updateNavigationState();
             updateUIForLoggedInUser();
             
             closeModal('login-modal');
             showAlert('Login successful! Welcome back.', 'success');
             
-            // Redirect to dashboard if on homepage
             if (window.location.pathname === '/' || window.location.pathname.includes('index.html')) {
                 setTimeout(() => {
                     window.location.href = 'dashboard.html';
@@ -210,12 +207,17 @@ async function handleLogin(event) {
 }
 
 async function handleSignup(event) {
-    event.preventDefault();
+    if (event) event.preventDefault();
     
-    const name = document.getElementById('signup-name').value;
-    const email = document.getElementById('signup-email').value;
-    const password = document.getElementById('signup-password').value;
-    const termsChecked = document.getElementById('terms-checkbox').checked;
+    const name = document.getElementById('signup-name')?.value;
+    const email = document.getElementById('signup-email')?.value;
+    const password = document.getElementById('signup-password')?.value;
+    const termsChecked = document.getElementById('terms-checkbox')?.checked;
+    
+    if (!name || !email || !password) {
+        showAlert('Please fill in all fields', 'error');
+        return;
+    }
     
     if (!termsChecked) {
         showAlert('Please accept the terms of service.', 'warning');
@@ -225,27 +227,22 @@ async function handleSignup(event) {
     showLoadingSpinner('signup-form');
     
     try {
-        // Simulate API call - replace with actual registration
         const response = await simulateSignup(name, email, password);
         
         if (response.success) {
-            // Store user data
             localStorage.setItem('vatax_user', JSON.stringify(response.user));
             localStorage.setItem('vatax_session', response.sessionToken);
             
-            // Update global state
             VATAX.currentUser = response.user;
             VATAX.userSession = response.sessionToken;
-            VATAX.isProUser = false; // New users start with free plan
+            VATAX.isProUser = false;
             
-            // Update UI
             updateNavigationState();
             updateUIForLoggedInUser();
             
             closeModal('signup-modal');
             showAlert('Account created successfully! Welcome to VATAX.', 'success');
             
-            // Redirect to dashboard
             setTimeout(() => {
                 window.location.href = 'dashboard.html';
             }, 1000);
@@ -260,18 +257,16 @@ async function handleSignup(event) {
     }
 }
 
-// Simulate login API call (replace with real API)
+// Simulate login API call
 async function simulateLogin(email, password) {
-    // Simulate network delay
     await new Promise(resolve => setTimeout(resolve, 1000));
     
-    // Demo user for testing
-    if (email === 'john@example.com' && password === 'demo123') {
+    if (email === 'demo@example.com' && password === 'demo123') {
         return {
             success: true,
             user: {
                 id: 'user_001',
-                name: 'John Doe',
+                name: 'Demo User',
                 email: email,
                 subscription_status: 'pro',
                 subscription_plan: 'monthly',
@@ -289,13 +284,11 @@ async function simulateLogin(email, password) {
     };
 }
 
-// Simulate signup API call (replace with real API)
+// Simulate signup API call
 async function simulateSignup(name, email, password) {
-    // Simulate network delay
     await new Promise(resolve => setTimeout(resolve, 1200));
     
-    // Check if email already exists (simple simulation)
-    if (email === 'john@example.com') {
+    if (email === 'demo@example.com') {
         return {
             success: false,
             message: 'Email already exists'
@@ -332,7 +325,6 @@ function logout() {
     
     showAlert('You have been logged out successfully.', 'info');
     
-    // Redirect to homepage if on dashboard
     if (window.location.pathname.includes('dashboard.html')) {
         window.location.href = 'index.html';
     }
@@ -350,8 +342,7 @@ function showSignup() {
 function showModal(modalId) {
     const modal = document.getElementById(modalId);
     if (modal) {
-        modal.classList.remove('hidden');
-        modal.classList.add('fade-in');
+        modal.style.display = 'block';
         document.body.style.overflow = 'hidden';
     }
 }
@@ -359,8 +350,7 @@ function showModal(modalId) {
 function closeModal(modalId) {
     const modal = document.getElementById(modalId);
     if (modal) {
-        modal.classList.add('hidden');
-        modal.classList.remove('fade-in');
+        modal.style.display = 'none';
         document.body.style.overflow = 'auto';
     }
 }
@@ -369,14 +359,14 @@ function closeModal(modalId) {
 function toggleMobileMenu() {
     const mobileMenu = document.getElementById('mobile-menu');
     if (mobileMenu) {
-        mobileMenu.classList.toggle('hidden');
+        mobileMenu.style.display = mobileMenu.style.display === 'none' ? 'block' : 'none';
     }
 }
 
 function toggleUserDropdown() {
     const dropdownMenu = document.getElementById('dropdown-menu');
     if (dropdownMenu) {
-        dropdownMenu.classList.toggle('hidden');
+        dropdownMenu.style.display = dropdownMenu.style.display === 'none' ? 'block' : 'none';
     }
 }
 
@@ -384,27 +374,33 @@ function closeDropdownsOnOutsideClick(event) {
     const userDropdown = document.getElementById('dropdown-menu');
     const userButton = document.getElementById('user-dropdown-btn');
     
-    if (userDropdown && !userDropdown.contains(event.target) && !userButton.contains(event.target)) {
-        userDropdown.classList.add('hidden');
+    if (userDropdown && userButton && !userDropdown.contains(event.target) && !userButton.contains(event.target)) {
+        userDropdown.style.display = 'none';
     }
 }
 
 // Utility functions
 function showAlert(message, type = 'info') {
-    // Create alert element
+    // Remove existing alerts
+    const existingAlerts = document.querySelectorAll('.alert');
+    existingAlerts.forEach(alert => alert.remove());
+    
     const alert = document.createElement('div');
-    alert.className = `alert alert-${type} fixed top-20 right-4 z-50 max-w-sm`;
+    alert.className = `alert alert-${type}`;
     alert.innerHTML = `
-        <div class="flex items-center">
-            <i class="fas fa-${getAlertIcon(type)} mr-2"></i>
+        <div style="display: flex; align-items: center; padding: 12px; background: ${getAlertColor(type)}; color: white; border-radius: 4px; margin: 10px; max-width: 400px;">
             <span>${message}</span>
-            <button onclick="this.parentElement.parentElement.remove()" class="ml-auto text-xl">×</button>
+            <button onclick="this.parentElement.parentElement.remove()" style="margin-left: auto; background: none; border: none; color: white; font-size: 20px; cursor: pointer;">×</button>
         </div>
     `;
     
+    alert.style.position = 'fixed';
+    alert.style.top = '20px';
+    alert.style.right = '20px';
+    alert.style.zIndex = '1000';
+    
     document.body.appendChild(alert);
     
-    // Auto remove after 5 seconds
     setTimeout(() => {
         if (alert.parentElement) {
             alert.remove();
@@ -412,29 +408,29 @@ function showAlert(message, type = 'info') {
     }, 5000);
 }
 
-function getAlertIcon(type) {
-    const icons = {
-        success: 'check-circle',
-        error: 'exclamation-circle',
-        warning: 'exclamation-triangle',
-        info: 'info-circle'
+function getAlertColor(type) {
+    const colors = {
+        success: '#10B981',
+        error: '#EF4444',
+        warning: '#F59E0B',
+        info: '#3B82F6'
     };
-    return icons[type] || 'info-circle';
+    return colors[type] || '#3B82F6';
 }
 
 function showLoadingSpinner(formId) {
     const form = document.getElementById(formId);
-    const submitButton = form.querySelector('button[type="submit"]');
+    const submitButton = form?.querySelector('button[type="submit"]');
     
     if (submitButton) {
         submitButton.disabled = true;
-        submitButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Loading...';
+        submitButton.innerHTML = 'Loading...';
     }
 }
 
 function hideLoadingSpinner(formId) {
     const form = document.getElementById(formId);
-    const submitButton = form.querySelector('button[type="submit"]');
+    const submitButton = form?.querySelector('button[type="submit"]');
     
     if (submitButton) {
         submitButton.disabled = false;
@@ -463,18 +459,20 @@ function formatNumber(number) {
 
 // Load user preferences
 function loadUserPreferences() {
-    const preferences = localStorage.getItem('vatax_preferences');
-    if (preferences) {
-        const prefs = JSON.parse(preferences);
-        // Apply user preferences
-        applyThemePreferences(prefs);
+    try {
+        const preferences = localStorage.getItem('vatax_preferences');
+        if (preferences) {
+            const prefs = JSON.parse(preferences);
+            applyThemePreferences(prefs);
+        }
+    } catch (error) {
+        console.error('Error loading preferences:', error);
     }
 }
 
 function applyThemePreferences(preferences) {
-    // Apply theme, language, etc.
     if (preferences.theme === 'dark') {
-        document.body.classList.add('dark-theme');
+        document.body.classList.add('dark');
     }
 }
 
@@ -487,11 +485,8 @@ function updateUserDashboardData() {
 
 async function loadDashboardData() {
     try {
-        // Load user calculations, statistics, etc.
         const calculations = await loadUserCalculations();
         const stats = await loadUserStatistics();
-        
-        // Update dashboard UI with loaded data
         updateDashboardStats(stats);
         updateRecentCalculations(calculations);
     } catch (error) {
@@ -500,7 +495,6 @@ async function loadDashboardData() {
 }
 
 async function loadUserCalculations() {
-    // Simulate API call to load user calculations
     return [
         {
             id: 'calc_001',
@@ -510,20 +504,11 @@ async function loadUserCalculations() {
             totalAmount: 57500,
             date: new Date().toISOString(),
             saved: true
-        },
-        {
-            id: 'calc_002',
-            type: 'income_tax',
-            baseAmount: 800000,
-            taxAmount: 78500,
-            date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-            saved: true
         }
     ];
 }
 
 async function loadUserStatistics() {
-    // Simulate API call to load user statistics
     return {
         totalCalculations: 247,
         vatCalculations: 156,
@@ -533,7 +518,6 @@ async function loadUserStatistics() {
 }
 
 function updateDashboardStats(stats) {
-    // Update statistics on dashboard page
     const elements = {
         'total-calculations': stats.totalCalculations,
         'vat-calculations': stats.vatCalculations,
@@ -556,26 +540,16 @@ function updateRecentCalculations(calculations) {
     tableBody.innerHTML = calculations.map(calc => `
         <tr>
             <td>
-                <div class="flex items-center">
-                    <i class="fas fa-${calc.type === 'vat' ? 'percentage' : 'coins'} 
-                       text-${calc.type === 'vat' ? 'orange' : 'green'} mr-2"></i>
+                <div style="display: flex; align-items: center;">
                     ${calc.type === 'vat' ? 'VAT' : 'Income Tax'}
                 </div>
             </td>
             <td>${formatCurrency(calc.baseAmount)}</td>
-            <td class="font-semibold">${formatCurrency(calc.totalAmount || calc.baseAmount + calc.taxAmount)}</td>
+            <td style="font-weight: 600;">${formatCurrency(calc.totalAmount || calc.baseAmount + calc.taxAmount)}</td>
             <td>${new Date(calc.date).toLocaleDateString()}</td>
             <td>
-                <div class="flex space-x-2">
-                    <button class="text-green hover:text-green-dark" title="View Details">
-                        <i class="fas fa-eye"></i>
-                    </button>
-                    <button class="text-orange hover:text-orange-dark" title="Download PDF">
-                        <i class="fas fa-download"></i>
-                    </button>
-                    <button class="text-navy hover:text-navy-dark" title="Email Report">
-                        <i class="fas fa-envelope"></i>
-                    </button>
+                <div style="display: flex; gap: 8px;">
+                    <button class="view-btn" title="View Details">View</button>
                 </div>
             </td>
         </tr>
@@ -605,8 +579,13 @@ function trackFreeCalculation() {
 
 // Quick calculator functions for homepage
 function calculateQuickVAT() {
-    const amount = parseFloat(document.getElementById('quick-vat-amount').value);
-    const rate = parseFloat(document.getElementById('quick-vat-rate').value);
+    const amountInput = document.getElementById('quick-vat-amount');
+    const rateInput = document.getElementById('quick-vat-rate');
+    
+    if (!amountInput || !rateInput) return;
+    
+    const amount = parseFloat(amountInput.value);
+    const rate = parseFloat(rateInput.value);
     
     if (isNaN(amount) || amount <= 0) {
         showAlert('Please enter a valid amount', 'warning');
@@ -616,16 +595,22 @@ function calculateQuickVAT() {
     const vatAmount = (amount * rate) / 100;
     const total = amount + vatAmount;
     
-    document.getElementById('quick-vat-amount-result').textContent = formatNumber(vatAmount);
-    document.getElementById('quick-vat-total-result').textContent = formatNumber(total);
-    document.getElementById('quick-vat-result').classList.remove('hidden');
+    const amountResult = document.getElementById('quick-vat-amount-result');
+    const totalResult = document.getElementById('quick-vat-total-result');
+    const resultDiv = document.getElementById('quick-vat-result');
     
-    // Track calculation
+    if (amountResult) amountResult.textContent = formatNumber(vatAmount);
+    if (totalResult) totalResult.textContent = formatNumber(total);
+    if (resultDiv) resultDiv.style.display = 'block';
+    
     trackFreeCalculation();
 }
 
 function calculateQuickTax() {
-    const income = parseFloat(document.getElementById('quick-tax-income').value);
+    const incomeInput = document.getElementById('quick-tax-income');
+    if (!incomeInput) return;
+    
+    const income = parseFloat(incomeInput.value);
     
     if (isNaN(income) || income <= 0) {
         showAlert('Please enter a valid income amount', 'warning');
@@ -634,17 +619,19 @@ function calculateQuickTax() {
     
     const taxCalculation = calculateIncomeTax(income, 'individual', '2024-25');
     
-    document.getElementById('quick-taxable-income').textContent = formatNumber(taxCalculation.taxableIncome);
-    document.getElementById('quick-tax-amount').textContent = formatNumber(taxCalculation.totalTax);
-    document.getElementById('quick-tax-result').classList.remove('hidden');
+    const taxableIncomeEl = document.getElementById('quick-taxable-income');
+    const taxAmountEl = document.getElementById('quick-tax-amount');
+    const resultDiv = document.getElementById('quick-tax-result');
     
-    // Track calculation
+    if (taxableIncomeEl) taxableIncomeEl.textContent = formatNumber(taxCalculation.taxableIncome);
+    if (taxAmountEl) taxAmountEl.textContent = formatNumber(taxCalculation.totalTax);
+    if (resultDiv) resultDiv.style.display = 'block';
+    
     trackFreeCalculation();
 }
 
 // Basic income tax calculation function
 function calculateIncomeTax(income, category = 'individual', year = '2024-25') {
-    // Tax slabs for different categories (2024-25)
     const taxSlabs = {
         individual: [
             { min: 0, max: 350000, rate: 0 },
@@ -653,22 +640,6 @@ function calculateIncomeTax(income, category = 'individual', year = '2024-25') {
             { min: 750000, max: 1150000, rate: 15 },
             { min: 1150000, max: 1650000, rate: 20 },
             { min: 1650000, max: Infinity, rate: 25 }
-        ],
-        female: [
-            { min: 0, max: 400000, rate: 0 },
-            { min: 400000, max: 500000, rate: 5 },
-            { min: 500000, max: 800000, rate: 10 },
-            { min: 800000, max: 1200000, rate: 15 },
-            { min: 1200000, max: 1700000, rate: 20 },
-            { min: 1700000, max: Infinity, rate: 25 }
-        ],
-        senior: [
-            { min: 0, max: 450000, rate: 0 },
-            { min: 450000, max: 550000, rate: 5 },
-            { min: 550000, max: 850000, rate: 10 },
-            { min: 850000, max: 1250000, rate: 15 },
-            { min: 1250000, max: 1750000, rate: 20 },
-            { min: 1750000, max: Infinity, rate: 25 }
         ]
     };
     
@@ -695,6 +666,49 @@ function calculateIncomeTax(income, category = 'individual', year = '2024-25') {
     };
 }
 
+// Netlify-specific fixes for SPA routing
+function setupSPARouting() {
+    // Handle internal links for SPA behavior
+    document.addEventListener('click', function(e) {
+        const link = e.target.closest('a');
+        if (link && link.href && link.href.startsWith(window.location.origin)) {
+            e.preventDefault();
+            const path = new URL(link.href).pathname;
+            navigateTo(path);
+        }
+    });
+}
+
+function navigateTo(path) {
+    // Simple SPA navigation
+    window.history.pushState({}, '', path);
+    loadPageContent(path);
+}
+
+function loadPageContent(path) {
+    // Simple content loading for SPA
+    const mainContent = document.getElementById('main-content');
+    if (mainContent) {
+        mainContent.innerHTML = `<div style="padding: 20px; text-align: center;">Loading ${path}...</div>`;
+        
+        // Simulate content loading
+        setTimeout(() => {
+            if (path.includes('dashboard')) {
+                initializeDashboard();
+            } else if (path.includes('vat-calculator')) {
+                initializeVATCalculator();
+            } else if (path.includes('tax-calculator')) {
+                initializeTaxCalculator();
+            }
+        }, 300);
+    }
+}
+
+// Initialize SPA routing
+document.addEventListener('DOMContentLoaded', function() {
+    setupSPARouting();
+});
+
 // Export functions to global scope
 window.showLogin = showLogin;
 window.showSignup = showSignup;
@@ -703,3 +717,4 @@ window.logout = logout;
 window.toggleMobileMenu = toggleMobileMenu;
 window.calculateQuickVAT = calculateQuickVAT;
 window.calculateQuickTax = calculateQuickTax;
+window.VATAX = window.VATAX || VATAX;
