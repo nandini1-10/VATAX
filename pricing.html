@@ -3,111 +3,422 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pricing</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-            color: #333;
+    <title>Pricing - VATAX</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="./css/style.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'navy': '#003366',
+                        'orange': '#FF9933',
+                        'green': '#228B22',
+                    }
+                }
+            }
         }
-        .container {
-            max-width: 960px;
-            margin: 20px auto;
-            padding: 20px;
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        h1 {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        .pricing-table {
-            display: flex;
-            justify-content: space-around;
-            flex-wrap: wrap;
-        }
-        .pricing-card {
-            width: 300px;
-            margin: 20px;
-            padding: 20px;
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
-            text-align: center;
-        }
-        .pricing-card h3 {
-            margin-top: 0;
-            font-size: 24px;
-        }
-        .price {
-            font-size: 36px;
-            font-weight: bold;
-            margin: 10px 0;
-        }
-        .features {
-            list-style: none;
-            padding: 0;
-        }
-        .features li {
-            margin: 5px 0;
-        }
-        .btn {
-            display: inline-block;
-            padding: 10px 20px;
-            background-color: #007bff;
-            color: #fff;
-            text-decoration: none;
-            border-radius: 5px;
-            margin-top: 15px;
-        }
-        .btn:hover {
-            background-color: #0056b3;
-        }
-    </style>
+    </script>
 </head>
-<body>
-    <div class="container">
-        <h1>Pricing Plans</h1>
-        <div class="pricing-table">
-            <div class="pricing-card">
-                <h3>Basic</h3>
-                <div class="price">$9.99/month</div>
-                <ul class="features">
-                    <li>Feature 1</li>
-                    <li>Feature 2</li>
-                    <li>Feature 3</li>
-                </ul>
-                <a href="#" class="btn">Choose Plan</a>
+<body class="bg-white font-inter">
+    <!-- Navigation -->
+    <nav class="bg-navy shadow-lg fixed w-full top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <a href="./index.html" class="text-white text-2xl font-bold">
+                            <i class="fas fa-calculator mr-2"></i>VATAX
+                        </a>
+                    </div>
+                    <div class="hidden md:ml-10 md:flex md:space-x-8">
+                        <a href="./index.html" class="nav-link">Home</a>
+                        <a href="./vat-calculator.html" class="nav-link">VAT Calculator</a>
+                        <a href="./tax-calculator.html" class="nav-link">Tax Calculator</a>
+                        <a href="./pricing.html" class="nav-link active">Pricing</a>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div id="auth-buttons" class="hidden md:flex space-x-3">
+                        <button onclick="showLogin()" class="btn-secondary">Log In</button>
+                        <button onclick="showSignup()" class="btn-primary">Sign Up</button>
+                    </div>
+                    <div id="user-menu" class="hidden relative">
+                        <button id="user-dropdown-btn" class="flex items-center text-white hover:text-orange">
+                            <i class="fas fa-user-circle mr-2"></i>
+                            <span id="user-name">User</span>
+                            <i class="fas fa-chevron-down ml-2"></i>
+                        </button>
+                        <div id="dropdown-menu" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg hidden">
+                            <a href="./dashboard.html" class="block px-4 py-2 text-navy hover:bg-gray-100">Dashboard</a>
+                            <a href="#" onclick="logout()" class="block px-4 py-2 text-navy hover:bg-gray-100">Logout</a>
+                        </div>
+                    </div>
+                    <button class="md:hidden text-white" onclick="toggleMobileMenu()">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
             </div>
-            <div class="pricing-card">
-                <h3>Standard</h3>
-                <div class="price">$19.99/month</div>
-                <ul class="features">
-                    <li>Feature 1</li>
-                    <li>Feature 2</li>
-                    <li>Feature 3</li>
-                    <li>Feature 4</li>
-                    <li>Feature 5</li>
-                </ul>
-                <a href="#" class="btn">Choose Plan</a>
+        </div>
+        <!-- Mobile menu -->
+        <div id="mobile-menu" class="md:hidden hidden bg-navy">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="./index.html" class="mobile-nav-link">Home</a>
+                <a href="./vat-calculator.html" class="mobile-nav-link">VAT Calculator</a>
+                <a href="./tax-calculator.html" class="mobile-nav-link">Tax Calculator</a>
+                <a href="./pricing.html" class="mobile-nav-link active">Pricing</a>
+                <div class="mt-4 space-y-2">
+                    <button onclick="showLogin()" class="w-full btn-secondary">Log In</button>
+                    <button onclick="showSignup()" class="w-full btn-primary">Sign Up</button>
+                </div>
             </div>
-            <div class="pricing-card">
-                <h3>Premium</h3>
-                <div class="price">$29.99/month</div>
-                <ul class="features">
-                    <li>Feature 1</li>
-                    <li>Feature 2</li>
-                    <li>Feature 3</li>
-                    <li>Feature 4</li>
-                    <li>Feature 5</li>
-                    <li>Feature 6</li>
-                </ul>
-                <a href="#" class="btn">Choose Plan</a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="pt-16">
+        <!-- Header Section -->
+        <section class="bg-gradient-to-br from-navy to-blue-900 text-white py-16">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center">
+                    <h1 class="text-4xl md:text-5xl font-bold mb-4">
+                        Simple, Transparent Pricing
+                    </h1>
+                    <p class="text-xl text-gray-200 max-w-3xl mx-auto">
+                        Choose the plan that works best for you. All plans include core VAT and tax calculation features.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Billing Toggle -->
+        <section class="py-8 bg-gray-50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-center items-center space-x-4">
+                    <span class="text-gray-600 font-medium">Monthly</span>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="billing-toggle" class="sr-only peer">
+                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-orange-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange"></div>
+                    </label>
+                    <span class="text-gray-600 font-medium">Yearly</span>
+                    <span class="bg-green-100 text-green-800 text-sm font-medium px-3 py-1 rounded-full">Save 17%</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pricing Plans -->
+        <section class="py-16">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid md:grid-cols-3 gap-8">
+                    <!-- Free Plan -->
+                    <div class="pricing-card">
+                        <div class="text-center mb-6">
+                            <h3 class="text-2xl font-bold text-navy mb-2">Free</h3>
+                            <div class="flex items-baseline justify-center">
+                                <span class="text-4xl font-bold text-navy">৳0</span>
+                                <span class="text-gray-600 ml-1">/forever</span>
+                            </div>
+                            <p class="text-gray-600 mt-2">Perfect for occasional calculations</p>
+                        </div>
+                        
+                        <ul class="feature-list mb-8">
+                            <li><i class="fas fa-check check-icon"></i> Basic VAT Calculator</li>
+                            <li><i class="fas fa-check check-icon"></i> Basic Tax Calculator</li>
+                            <li><i class="fas fa-check check-icon"></i> Bangladesh Tax Rates</li>
+                            <li><i class="fas fa-times cross-icon"></i> Save Calculations</li>
+                            <li><i class="fas fa-times cross-icon"></i> PDF Reports</li>
+                            <li><i class="fas fa-times cross-icon"></i> Email Reports</li>
+                            <li><i class="fas fa-times cross-icon"></i> Calculation History</li>
+                            <li><i class="fas fa-times cross-icon"></i> Tax Saving Tips</li>
+                        </ul>
+                        
+                        <button onclick="signupFree()" class="w-full btn-secondary py-3">
+                            Get Started Free
+                        </button>
+                    </div>
+
+                    <!-- Pro Plan (Featured) -->
+                    <div class="pricing-card featured relative">
+                        <div class="popular-badge">MOST POPULAR</div>
+                        <div class="text-center mb-6">
+                            <h3 class="text-2xl font-bold text-navy mb-2">Pro</h3>
+                            <div class="flex items-baseline justify-center">
+                                <span id="pro-price" class="text-4xl font-bold text-navy">৳99</span>
+                                <span id="pro-period" class="text-gray-600 ml-1">/month</span>
+                            </div>
+                            <p id="yearly-savings" class="text-green font-semibold mt-1 hidden">Save ৳200 yearly</p>
+                            <p class="text-gray-600 mt-2">For professionals & small businesses</p>
+                        </div>
+                        
+                        <ul class="feature-list mb-8">
+                            <li><i class="fas fa-check check-icon"></i> Everything in Free</li>
+                            <li><i class="fas fa-check check-icon"></i> Unlimited Calculations</li>
+                            <li><i class="fas fa-check check-icon"></i> Save Calculation History</li>
+                            <li><i class="fas fa-check check-icon"></i> PDF Export & Reports</li>
+                            <li><i class="fas fa-check check-icon"></i> Email/SMS Reports</li>
+                            <li><i class="fas fa-check check-icon"></i> Tax Saving Tips</li>
+                            <li><i class="fas fa-check check-icon"></i> Bulk Calculations</li>
+                            <li><i class="fas fa-check check-icon"></i> Priority Support</li>
+                        </ul>
+                        
+                        <button onclick="upgradeToPro()" class="w-full btn-orange py-3">
+                            Start 7-Day Free Trial
+                        </button>
+                    </div>
+
+                    <!-- Enterprise Plan -->
+                    <div class="pricing-card">
+                        <div class="text-center mb-6">
+                            <h3 class="text-2xl font-bold text-navy mb-2">Enterprise</h3>
+                            <div class="flex items-baseline justify-center">
+                                <span class="text-4xl font-bold text-navy">Custom</span>
+                            </div>
+                            <p class="text-gray-600 mt-2">For large organizations</p>
+                        </div>
+                        
+                        <ul class="feature-list mb-8">
+                            <li><i class="fas fa-check check-icon"></i> Everything in Pro</li>
+                            <li><i class="fas fa-check check-icon"></i> Multi-user Access</li>
+                            <li><i class="fas fa-check check-icon"></i> Custom Tax Rules</li>
+                            <li><i class="fas fa-check check-icon"></i> API Access</li>
+                            <li><i class="fas fa-check check-icon"></i> White-label Solution</li>
+                            <li><i class="fas fa-check check-icon"></i> Dedicated Support</li>
+                            <li><i class="fas fa-check check-icon"></i> Training Sessions</li>
+                            <li><i class="fas fa-check check-icon"></i> Custom Integration</li>
+                        </ul>
+                        
+                        <button onclick="contactSales()" class="w-full btn-primary py-3">
+                            Contact Sales
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Feature Comparison -->
+        <section class="py-16 bg-gray-50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-3xl font-bold text-center text-navy mb-12">Feature Comparison</h2>
+                
+                <div class="bg-white rounded-lg shadow overflow-hidden">
+                    <table class="w-full data-table">
+                        <thead>
+                            <tr>
+                                <th class="w-1/3">Feature</th>
+                                <th class="text-center">Free</th>
+                                <th class="text-center">Pro</th>
+                                <th class="text-center">Enterprise</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>VAT Calculator</td>
+                                <td class="text-center"><i class="fas fa-check text-green"></i></td>
+                                <td class="text-center"><i class="fas fa-check text-green"></i></td>
+                                <td class="text-center"><i class="fas fa-check text-green"></i></td>
+                            </tr>
+                            <tr>
+                                <td>Income Tax Calculator</td>
+                                <td class="text-center"><i class="fas fa-check text-green"></i></td>
+                                <td class="text-center"><i class="fas fa-check text-green"></i></td>
+                                <td class="text-center"><i class="fas fa-check text-green"></i></td>
+                            </tr>
+                            <tr>
+                                <td>Save Calculations</td>
+                                <td class="text-center"><i class="fas fa-times text-red-500"></i></td>
+                                <td class="text-center"><i class="fas fa-check text-green"></i></td>
+                                <td class="text-center"><i class="fas fa-check text-green"></i></td>
+                            </tr>
+                            <tr>
+                                <td>PDF Reports</td>
+                                <td class="text-center"><i class="fas fa-times text-red-500"></i></td>
+                                <td class="text-center"><i class="fas fa-check text-green"></i></td>
+                                <td class="text-center"><i class="fas fa-check text-green"></i></td>
+                            </tr>
+                            <tr>
+                                <td>Email Reports</td>
+                                <td class="text-center"><i class="fas fa-times text-red-500"></i></td>
+                                <td class="text-center"><i class="fas fa-check text-green"></i></td>
+                                <td class="text-center"><i class="fas fa-check text-green"></i></td>
+                            </tr>
+                            <tr>
+                                <td>Bulk Calculations</td>
+                                <td class="text-center"><i class="fas fa-times text-red-500"></i></td>
+                                <td class="text-center"><i class="fas fa-check text-green"></i></td>
+                                <td class="text-center"><i class="fas fa-check text-green"></i></td>
+                            </tr>
+                            <tr>
+                                <td>Tax Saving Tips</td>
+                                <td class="text-center"><i class="fas fa-times text-red-500"></i></td>
+                                <td class="text-center"><i class="fas fa-check text-green"></i></td>
+                                <td class="text-center"><i class="fas fa-check text-green"></i></td>
+                            </tr>
+                            <tr>
+                                <td>Priority Support</td>
+                                <td class="text-center"><i class="fas fa-times text-red-500"></i></td>
+                                <td class="text-center"><i class="fas fa-check text-green"></i></td>
+                                <td class="text-center"><i class="fas fa-check text-green"></i></td>
+                            </tr>
+                            <tr>
+                                <td>API Access</td>
+                                <td class="text-center"><i class="fas fa-times text-red-500"></i></td>
+                                <td class="text-center"><i class="fas fa-times text-red-500"></i></td>
+                                <td class="text-center"><i class="fas fa-check text-green"></i></td>
+                            </tr>
+                            <tr>
+                                <td>Custom Integration</td>
+                                <td class="text-center"><i class="fas fa-times text-red-500"></i></td>
+                                <td class="text-center"><i class="fas fa-times text-red-500"></i></td>
+                                <td class="text-center"><i class="fas fa-check text-green"></i></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ Section -->
+        <section class="py-16">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-3xl font-bold text-center text-navy mb-12">Frequently Asked Questions</h2>
+                
+                <div class="space-y-6">
+                    <div class="bg-white border border-gray-200 rounded-lg p-6">
+                        <h3 class="text-lg font-semibold text-navy mb-2">Can I change plans anytime?</h3>
+                        <p class="text-gray-600">Yes, you can upgrade, downgrade, or cancel your subscription at any time. Changes take effect immediately.</p>
+                    </div>
+                    
+                    <div class="bg-white border border-gray-200 rounded-lg p-6">
+                        <h3 class="text-lg font-semibold text-navy mb-2">Is there a free trial?</h3>
+                        <p class="text-gray-600">Yes! The Pro plan comes with a 7-day free trial. No credit card required to start.</p>
+                    </div>
+                    
+                    <div class="bg-white border border-gray-200 rounded-lg p-6">
+                        <h3 class="text-lg font-semibold text-navy mb-2">What payment methods do you accept?</h3>
+                        <p class="text-gray-600">We accept bKash, Nagad, Rocket, and international credit/debit cards.</p>
+                    </div>
+                    
+                    <div class="bg-white border border-gray-200 rounded-lg p-6">
+                        <h3 class="text-lg font-semibold text-navy mb-2">Are the tax rates updated regularly?</h3>
+                        <p class="text-gray-600">Yes, we update all tax rates and slabs according to the latest Bangladesh government regulations.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-navy text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-xl font-bold mb-4">
+                        <i class="fas fa-calculator mr-2"></i>VATAX
+                    </h3>
+                    <p class="text-gray-300 mb-4">Smart VAT & Tax Calculator for Bangladesh</p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-300 hover:text-orange"><i class="fab fa-facebook"></i></a>
+                        <a href="#" class="text-gray-300 hover:text-orange"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="text-gray-300 hover:text-orange"><i class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Calculators</h4>
+                    <ul class="space-y-2 text-gray-300">
+                        <li><a href="./vat-calculator.html" class="hover:text-orange">VAT Calculator</a></li>
+                        <li><a href="./tax-calculator.html" class="hover:text-orange">Income Tax Calculator</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Company</h4>
+                    <ul class="space-y-2 text-gray-300">
+                        <li><a href="./pricing.html" class="hover:text-orange">Pricing</a></li>
+                        <li><a href="#" class="hover:text-orange">About Us</a></li>
+                        <li><a href="#" class="hover:text-orange">Contact</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Support</h4>
+                    <ul class="space-y-2 text-gray-300">
+                        <li><a href="#" class="hover:text-orange">Help Center</a></li>
+                        <li><a href="#" class="hover:text-orange">Privacy Policy</a></li>
+                        <li><a href="#" class="hover:text-orange">Terms of Service</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-300">
+                <p>&copy; 2024 VATAX. All rights reserved. | Built for Bangladesh</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Upgrade Modal -->
+    <div id="upgrade-modal" class="modal hidden">
+        <div class="modal-content max-w-md">
+            <div class="modal-header">
+                <h2 class="text-2xl font-bold text-navy">Upgrade to Pro</h2>
+                <button onclick="closeModal('upgrade-modal')" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="space-y-6">
+                <!-- Plan Selection -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-3">Choose Plan</label>
+                    <div class="space-y-3">
+                        <label class="flex items-center p-4 border border-gray-200 rounded-lg cursor-pointer hover:border-orange">
+                            <input type="radio" name="upgrade-plan" value="monthly" checked class="mr-3">
+                            <div>
+                                <div class="font-semibold">Pro Monthly</div>
+                                <div class="text-sm text-gray-600">৳99 per month</div>
+                            </div>
+                        </label>
+                        <label class="flex items-center p-4 border border-gray-200 rounded-lg cursor-pointer hover:border-orange">
+                            <input type="radio" name="upgrade-plan" value="yearly" class="mr-3">
+                            <div>
+                                <div class="font-semibold">Pro Yearly</div>
+                                <div class="text-sm text-gray-600">৳999 per year (Save ৳200)</div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Payment Method -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-3">Payment Method</label>
+                    <div class="grid grid-cols-3 gap-3">
+                        <button onclick="selectPayment('bkash')" class="p-3 border border-gray-200 rounded-lg text-center hover:border-orange">
+                            <i class="fas fa-mobile-alt text-orange text-2xl mb-2"></i>
+                            <div class="text-sm font-medium">bKash</div>
+                        </button>
+                        <button onclick="selectPayment('nagad')" class="p-3 border border-gray-200 rounded-lg text-center hover:border-orange">
+                            <i class="fas fa-university text-green text-2xl mb-2"></i>
+                            <div class="text-sm font-medium">Nagad</div>
+                        </button>
+                        <button onclick="selectPayment('card')" class="p-3 border border-gray-200 rounded-lg text-center hover:border-orange">
+                            <i class="fas fa-credit-card text-navy text-2xl mb-2"></i>
+                            <div class="text-sm font-medium">Card</div>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Upgrade Button -->
+                <button onclick="processUpgrade()" class="w-full btn-orange py-3">
+                    Start 7-Day Free Trial
+                </button>
+
+                <p class="text-xs text-gray-500 text-center">
+                    7-day free trial, then ৳99/month. Cancel anytime.
+                </p>
             </div>
         </div>
     </div>
+
+    <script src="./js/pricing.js"></script>
+    <script src="./js/main.js"></script>
 </body>
 </html>
