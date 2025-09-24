@@ -3,67 +3,399 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VAT Calculator</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-        .container {
-            width: 300px;
-            margin: auto;
-        }
-        label, input, button {
-            margin-bottom: 10px;
-            display: block;
-            width: 100%;
-            box-sizing: border-box;
-        }
-        input {
-            padding: 8px;
-        }
-        button {
-            padding: 10px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #3e8e41;
-        }
-        #result {
-            margin-top: 20px;
-            font-weight: bold;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>VAT Calculator</h1>
-        <label for="amount">Enter Amount:</label>
-        <input type="number" id="amount" placeholder="Amount" required>
-        <label for="vatRate">Enter VAT Rate (%):</label>
-        <input type="number" id="vatRate" placeholder="VAT Rate" value="20" required>
-        <button onclick="calculateVAT()">Calculate</button>
-        <div id="result"></div>
-    </div>
-
+    <title>VAT Calculator - VATAX</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="./css/style.css">
+    
     <script>
-        function calculateVAT() {
-            var amount = parseFloat(document.getElementById("amount").value);
-            var vatRate = parseFloat(document.getElementById("vatRate").value);
-
-            if (isNaN(amount) || isNaN(vatRate)) {
-                document.getElementById("result").innerText = "Please enter valid numbers.";
-                return;
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'navy': '#003366',
+                        'orange': '#FF9933',
+                        'green': '#228B22',
+                    }
+                }
             }
-
-            var vatAmount = amount * (vatRate / 100);
-            var totalAmount = amount + vatAmount;
-
-            document.getElementById("result").innerText = "VAT Amount: " + vatAmount.toFixed(2) + "\nTotal Amount: " + totalAmount.toFixed(2);
         }
     </script>
+</head>
+<body class="bg-white font-inter">
+    <!-- Navigation -->
+    <nav class="bg-navy shadow-lg fixed w-full top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <a href="./index.html" class="text-white text-2xl font-bold">
+                            <i class="fas fa-calculator mr-2"></i>VATAX
+                        </a>
+                    </div>
+                    <div class="hidden md:ml-10 md:flex md:space-x-8">
+                        <a href="./index.html" class="nav-link">Home</a>
+                        <a href="./vat-calculator.html" class="nav-link active">VAT Calculator</a>
+                        <a href="./tax-calculator.html" class="nav-link">Tax Calculator</a>
+                        <a href="./pricing.html" class="nav-link">Pricing</a>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div id="auth-buttons" class="hidden md:flex space-x-3">
+                        <button onclick="showLogin()" class="btn-secondary">Log In</button>
+                        <button onclick="showSignup()" class="btn-primary">Sign Up</button>
+                    </div>
+                    <div id="user-menu" class="hidden relative">
+                        <button id="user-dropdown-btn" class="flex items-center text-white hover:text-orange">
+                            <i class="fas fa-user-circle mr-2"></i>
+                            <span id="user-name">User</span>
+                            <i class="fas fa-chevron-down ml-2"></i>
+                        </button>
+                        <div id="dropdown-menu" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg hidden">
+                            <a href="./dashboard.html" class="block px-4 py-2 text-navy hover:bg-gray-100">Dashboard</a>
+                            <a href="#" onclick="logout()" class="block px-4 py-2 text-navy hover:bg-gray-100">Logout</a>
+                        </div>
+                    </div>
+                    <button class="md:hidden text-white" onclick="toggleMobileMenu()">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Mobile menu -->
+        <div id="mobile-menu" class="md:hidden hidden bg-navy">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="./index.html" class="mobile-nav-link">Home</a>
+                <a href="./vat-calculator.html" class="mobile-nav-link active">VAT Calculator</a>
+                <a href="./tax-calculator.html" class="mobile-nav-link">Tax Calculator</a>
+                <a href="./pricing.html" class="mobile-nav-link">Pricing</a>
+                <div class="mt-4 space-y-2">
+                    <button onclick="showLogin()" class="w-full btn-secondary">Log In</button>
+                    <button onclick="showSignup()" class="w-full btn-primary">Sign Up</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="pt-16">
+        <!-- Header Section -->
+        <section class="bg-gradient-to-br from-navy to-blue-900 text-white py-16">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center">
+                    <h1 class="text-4xl md:text-5xl font-bold mb-4">
+                        VAT Calculator
+                    </h1>
+                    <p class="text-xl text-gray-200 max-w-3xl mx-auto">
+                        Calculate Value Added Tax (VAT) accurately with Bangladesh-specific rates
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- VAT Calculator Section -->
+        <section class="py-16">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid md:grid-cols-2 gap-8">
+                    <!-- Calculator Form -->
+                    <div class="calculator-card vat-card">
+                        <h2 class="text-2xl font-bold text-navy mb-6">
+                            <i class="fas fa-percentage text-orange mr-2"></i>Calculate VAT
+                        </h2>
+                        
+                        <div class="space-y-6">
+                            <!-- Calculation Type -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-3">Calculation Type</label>
+                                <div class="flex space-x-4">
+                                    <label class="flex items-center">
+                                        <input type="radio" name="calculation-type" value="exclusive" checked class="mr-2">
+                                        <span>Amount excluding VAT</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="radio" name="calculation-type" value="inclusive" class="mr-2">
+                                        <span>Amount including VAT</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Amount Input -->
+                            <div>
+                                <label id="amount-label" class="block text-sm font-medium text-gray-700 mb-1">Base Amount (৳)</label>
+                                <input type="number" id="base-amount" class="w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange focus:border-transparent" placeholder="Enter amount" min="0" step="0.01">
+                            </div>
+
+                            <!-- VAT Rate -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">VAT Rate (%)</label>
+                                <select id="vat-rate" class="w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange focus:border-transparent">
+                                    <option value="15">15% (Standard Rate)</option>
+                                    <option value="7.5">7.5% (Reduced Rate)</option>
+                                    <option value="5">5% (Essential Goods)</option>
+                                    <option value="0">0% (Zero-rated)</option>
+                                    <option value="custom">Custom Rate</option>
+                                </select>
+                            </div>
+
+                            <!-- Custom Rate (Hidden by default) -->
+                            <div id="custom-rate-container" class="hidden">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Custom VAT Rate (%)</label>
+                                <input type="number" id="custom-rate" class="w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange focus:border-transparent" placeholder="Enter custom rate" min="0" max="100" step="0.1">
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="flex space-x-3">
+                                <button onclick="calculateVAT()" class="flex-1 btn-orange py-3">
+                                    <i class="fas fa-calculator mr-2"></i>Calculate VAT
+                                </button>
+                                <button onclick="clearCalculation()" class="px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50">
+                                    <i class="fas fa-redo mr-2"></i>Clear
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Results Section -->
+                    <div>
+                        <div id="no-results" class="bg-gray-50 border border-gray-200 rounded-lg p-8 text-center">
+                            <i class="fas fa-calculator text-gray-400 text-4xl mb-4"></i>
+                            <h3 class="text-lg font-semibold text-gray-600 mb-2">No Calculation Yet</h3>
+                            <p class="text-gray-500">Enter amount and VAT rate to see results</p>
+                        </div>
+
+                        <div id="calculation-results" class="hidden">
+                            <div class="result-display vat-result">
+                                <h3 class="text-xl font-semibold text-navy mb-4">VAT Calculation Results</h3>
+                                
+                                <div class="space-y-3">
+                                    <div class="result-item">
+                                        <span class="result-label">Base Amount:</span>
+                                        <span class="result-value">৳<span id="result-base">0</span></span>
+                                    </div>
+                                    <div class="result-item">
+                                        <span class="result-label">VAT Rate:</span>
+                                        <span class="result-value"><span id="result-rate">0</span>%</span>
+                                    </div>
+                                    <div class="result-item">
+                                        <span class="result-label">VAT Amount:</span>
+                                        <span class="result-value">৳<span id="result-vat">0</span></span>
+                                    </div>
+                                    <div class="result-item">
+                                        <span class="result-label">Total Amount:</span>
+                                        <span class="result-value text-green">৳<span id="result-total">0</span></span>
+                                    </div>
+                                </div>
+
+                                <!-- Calculation Breakdown -->
+                                <div id="calculation-breakdown" class="mt-4 p-3 bg-white rounded border border-gray-200 text-sm text-gray-600 space-y-1">
+                                    <!-- Breakdown will be inserted here by JavaScript -->
+                                </div>
+
+                                <!-- Pro Features -->
+                                <div id="pro-features" class="mt-6 pt-6 border-t border-gray-200">
+                                    <h4 class="font-semibold text-navy mb-3">Save & Export</h4>
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <button onclick="saveCalculation()" class="btn-outline-orange py-2 text-sm" data-pro="true">
+                                            <i class="fas fa-save mr-1"></i>Save
+                                        </button>
+                                        <button onclick="exportToPDF()" class="btn-outline-orange py-2 text-sm" data-pro="true">
+                                            <i class="fas fa-file-pdf mr-1"></i>PDF
+                                        </button>
+                                        <button onclick="emailReport()" class="btn-outline-orange py-2 text-sm" data-pro="true">
+                                            <i class="fas fa-envelope mr-1"></i>Email
+                                        </button>
+                                        <button onclick="addToComparison()" class="btn-outline-orange py-2 text-sm" data-pro="true">
+                                            <i class="fas fa-chart-bar mr-1"></i>Compare
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Bulk Calculator (Pro Feature) -->
+                        <div class="mt-8 bg-navy text-white rounded-lg p-6">
+                            <h3 class="text-lg font-semibold mb-3">
+                                <i class="fas fa-bolt mr-2"></i>Bulk Calculations (Pro Feature)
+                            </h3>
+                            <p class="text-gray-300 text-sm mb-4">Calculate VAT for multiple amounts at once</p>
+                            <button onclick="showBulkCalculator()" class="w-full btn-orange py-2" data-pro="true">
+                                <i class="fas fa-layer-group mr-2"></i>Open Bulk Calculator
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bulk Calculator Modal -->
+                <div id="bulk-calculator" class="hidden mt-8 bg-white border border-orange rounded-lg p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-semibold text-navy">Bulk VAT Calculator</h3>
+                        <button onclick="document.getElementById('bulk-calculator').classList.add('hidden')" class="text-gray-500 hover:text-gray-700">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    
+                    <div id="bulk-inputs" class="space-y-3">
+                        <!-- Bulk input rows will be added here -->
+                    </div>
+                    
+                    <button onclick="addBulkInput()" class="w-full btn-outline-orange mt-4 py-2">
+                        <i class="fas fa-plus mr-2"></i>Add Another Item
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- VAT Rates Info Section -->
+        <section class="py-16 bg-gray-50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-3xl font-bold text-center text-navy mb-12">Bangladesh VAT Rates</h2>
+                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="bg-white rounded-lg shadow p-6 text-center">
+                        <div class="w-12 h-12 bg-orange rounded-full flex items-center justify-center mx-auto mb-3">
+                            <span class="text-white font-bold text-lg">15%</span>
+                        </div>
+                        <h3 class="font-semibold text-navy mb-2">Standard Rate</h3>
+                        <p class="text-gray-600 text-sm">Most goods and services</p>
+                    </div>
+                    <div class="bg-white rounded-lg shadow p-6 text-center">
+                        <div class="w-12 h-12 bg-green rounded-full flex items-center justify-center mx-auto mb-3">
+                            <span class="text-white font-bold text-lg">7.5%</span>
+                        </div>
+                        <h3 class="font-semibold text-navy mb-2">Reduced Rate</h3>
+                        <p class="text-gray-600 text-sm">Specific categories</p>
+                    </div>
+                    <div class="bg-white rounded-lg shadow p-6 text-center">
+                        <div class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-3">
+                            <span class="text-white font-bold text-lg">5%</span>
+                        </div>
+                        <h3 class="font-semibold text-navy mb-2">Essential Goods</h3>
+                        <p class="text-gray-600 text-sm">Basic necessities</p>
+                    </div>
+                    <div class="bg-white rounded-lg shadow p-6 text-center">
+                        <div class="w-12 h-12 bg-gray-500 rounded-full flex items-center justify-center mx-auto mb-3">
+                            <span class="text-white font-bold text-lg">0%</span>
+                        </div>
+                        <h3 class="font-semibold text-navy mb-2">Zero-rated</h3>
+                        <p class="text-gray-600 text-sm">Exports and specific items</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-navy text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-xl font-bold mb-4">
+                        <i class="fas fa-calculator mr-2"></i>VATAX
+                    </h3>
+                    <p class="text-gray-300 mb-4">Smart VAT & Tax Calculator for Bangladesh</p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-300 hover:text-orange"><i class="fab fa-facebook"></i></a>
+                        <a href="#" class="text-gray-300 hover:text-orange"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="text-gray-300 hover:text-orange"><i class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Calculators</h4>
+                    <ul class="space-y-2 text-gray-300">
+                        <li><a href="./vat-calculator.html" class="hover:text-orange">VAT Calculator</a></li>
+                        <li><a href="./tax-calculator.html" class="hover:text-orange">Income Tax Calculator</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Company</h4>
+                    <ul class="space-y-2 text-gray-300">
+                        <li><a href="./pricing.html" class="hover:text-orange">Pricing</a></li>
+                        <li><a href="#" class="hover:text-orange">About Us</a></li>
+                        <li><a href="#" class="hover:text-orange">Contact</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Support</h4>
+                    <ul class="space-y-2 text-gray-300">
+                        <li><a href="#" class="hover:text-orange">Help Center</a></li>
+                        <li><a href="#" class="hover:text-orange">Privacy Policy</a></li>
+                        <li><a href="#" class="hover:text-orange">Terms of Service</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-300">
+                <p>&copy; 2024 VATAX. All rights reserved. | Built for Bangladesh</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Login Modal -->
+    <div id="login-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="text-2xl font-bold text-navy">Login to VATAX</h2>
+                <button onclick="closeModal('login-modal')" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="login-form" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                    <input type="email" id="login-email" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                    <input type="password" id="login-password" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange" required>
+                </div>
+                <button type="submit" class="w-full btn-primary">Login</button>
+                <div class="text-center">
+                    <button type="button" onclick="showSignup(); closeModal('login-modal')" class="text-orange hover:text-orange-dark">
+                        Don't have an account? Sign up
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Signup Modal -->
+    <div id="signup-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="text-2xl font-bold text-navy">Join VATAX</h2>
+                <button onclick="closeModal('signup-modal')" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="signup-form" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                    <input type="text" id="signup-name" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                    <input type="email" id="signup-email" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                    <input type="password" id="signup-password" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange" required>
+                </div>
+                <div class="flex items-center">
+                    <input type="checkbox" id="terms-checkbox" class="mr-2" required>
+                    <label for="terms-checkbox" class="text-sm text-gray-700">
+                        I agree to the <a href="#" class="text-orange hover:text-orange-dark">Terms of Service</a>
+                    </label>
+                </div>
+                <button type="submit" class="w-full btn-primary">Create Account</button>
+                <div class="text-center">
+                    <button type="button" onclick="showLogin(); closeModal('signup-modal')" class="text-orange hover:text-orange-dark">
+                        Already have an account? Login
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="./js/vat-calculator.js"></script>
+    <script src="./js/main.js"></script>
 </body>
 </html>
