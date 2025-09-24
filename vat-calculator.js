@@ -1,7 +1,4 @@
-// VAT Calculator JavaScript
-// Handles all VAT calculation functionality and UI interactions
-
-// VAT Calculator State
+// VAT Calculator JavaScript - Netlify compatible
 const VATCalculator = {
     currentCalculation: null,
     savedCalculations: [],
@@ -11,7 +8,8 @@ const VATCalculator = {
 
 // DOM Content Loaded Event for VAT Calculator
 document.addEventListener('DOMContentLoaded', function() {
-    if (window.location.pathname.includes('vat-calculator.html')) {
+    if (window.location.pathname.includes('vat-calculator.html') || 
+        document.getElementById('vat-calculator-section')) {
         initializeVATCalculator();
     }
 });
@@ -47,6 +45,18 @@ function setupVATEventListeners() {
     calculationTypeInputs.forEach(input => {
         input.addEventListener('change', handleCalculationTypeChange);
     });
+    
+    // Add clear button event
+    const clearButton = document.querySelector('[onclick="clearCalculation()"]');
+    if (clearButton) {
+        clearButton.addEventListener('click', clearCalculation);
+    }
+    
+    // Add save button event
+    const saveButton = document.querySelector('[onclick="saveCalculation()"]');
+    if (saveButton) {
+        saveButton.addEventListener('click', saveCalculation);
+    }
 }
 
 function setupCalculationTypeHandlers() {
@@ -54,22 +64,23 @@ function setupCalculationTypeHandlers() {
     calculationTypeInputs.forEach(input => {
         input.addEventListener('change', updateAmountLabel);
     });
-    updateAmountLabel(); // Initial update
+    updateAmountLabel();
 }
 
 function handleVATRateChange() {
     const vatRateSelect = document.getElementById('vat-rate');
     const customRateContainer = document.getElementById('custom-rate-container');
     
-    if (vatRateSelect.value === 'custom') {
-        customRateContainer.classList.remove('hidden');
-        const customRateInput = document.getElementById('custom-rate');
-        customRateInput.focus();
-    } else {
-        customRateContainer.classList.add('hidden');
+    if (vatRateSelect && customRateContainer) {
+        if (vatRateSelect.value === 'custom') {
+            customRateContainer.style.display = 'block';
+            const customRateInput = document.getElementById('custom-rate');
+            if (customRateInput) customRateInput.focus();
+        } else {
+            customRateContainer.style.display = 'none';
+        }
+        calculateVAT();
     }
-    
-    calculateVAT();
 }
 
 function handleCalculationTypeChange() {
@@ -78,13 +89,15 @@ function handleCalculationTypeChange() {
 }
 
 function updateAmountLabel() {
-    const calculationType = document.querySelector('input[name="calculation-type"]:checked').value;
+    const calculationType = document.querySelector('input[name="calculation-type"]:checked');
     const amountLabel = document.getElementById('amount-label');
     
-    if (calculationType === 'inclusive') {
-        amountLabel.textContent = 'Total Amount (৳)';
-    } else {
-        amountLabel.textContent = 'Base Amount (৳)';
+    if (calculationType && amountLabel) {
+        if (calculationType.value === 'inclusive') {
+            amountLabel.textContent = 'Total Amount (৳)';
+        } else {
+            amountLabel.textContent = 'Base Amount (৳)';
+        }
     }
 }
 
@@ -95,11 +108,14 @@ function calculateVAT() {
     const vatRateSelect = document.getElementById('vat-rate');
     const customRateInput = document.getElementById('custom-rate');
     
+    if (!baseAmountInput || !vatRateSelect) return;
+    
     const baseAmount = parseFloat(baseAmountInput.value);
     
     // Get VAT rate
     let vatRate;
     if (vatRateSelect.value === 'custom') {
+        if (!customRateInput) return;
         vatRate = parseFloat(customRateInput.value);
         if (isNaN(vatRate)) {
             showVATError('Please enter a valid custom VAT rate');
@@ -123,10 +139,14 @@ function calculateVAT() {
     VATCalculator.isCalculating = true;
     
     // Get calculation type
-    const calculationType = document.querySelector('input[name="calculation-type"]:checked').value;
+    const calculationType = document.querySelector('input[name="calculation-type"]:checked');
+    if (!calculationType) {
+        VATCalculator.isCalculating = false;
+        return;
+    }
     
     let calculation;
-    if (calculationType === 'inclusive') {
+    if (calculationType.value === 'inclusive') {
         calculation = calculateVATInclusive(baseAmount, vatRate);
     } else {
         calculation = calculateVATExclusive(baseAmount, vatRate);
@@ -135,7 +155,7 @@ function calculateVAT() {
     // Store current calculation
     VATCalculator.currentCalculation = {
         ...calculation,
-        calculationType,
+        calculationType: calculationType.value,
         timestamp: new Date().toISOString(),
         id: 'calc_' + Date.now()
     };
@@ -201,8 +221,8 @@ function displayVATResults(calculation) {
     const noResults = document.getElementById('no-results');
     
     if (resultsPanel && noResults) {
-        resultsPanel.classList.remove('hidden');
-        noResults.classList.add('hidden');
+        resultsPanel.style.display = 'block';
+        noResults.style.display = 'none';
     }
     
     // Update result values
@@ -227,9 +247,6 @@ function displayVATResults(calculation) {
             .map(line => `<div>${line}</div>`)
             .join('');
     }
-    
-    // Add animation
-    resultsPanel.classList.add('fade-in');
 }
 
 function hideVATResults() {
@@ -237,8 +254,8 @@ function hideVATResults() {
     const noResults = document.getElementById('no-results');
     
     if (resultsPanel && noResults) {
-        resultsPanel.classList.add('hidden');
-        noResults.classList.remove('hidden');
+        resultsPanel.style.display = 'none';
+        noResults.style.display = 'block';
     }
 }
 
@@ -249,13 +266,19 @@ function showVATError(message) {
 
 function clearCalculation() {
     // Clear form inputs
-    document.getElementById('base-amount').value = '';
-    document.getElementById('vat-rate').selectedIndex = 0;
-    document.getElementById('custom-rate').value = '';
-    document.getElementById('custom-rate-container').classList.add('hidden');
+    const baseAmountInput = document.getElementById('base-amount');
+    const vatRateSelect = document.getElementById('vat-rate');
+    const customRateInput = document.getElementById('custom-rate');
+    const customRateContainer = document.getElementById('custom-rate-container');
+    
+    if (baseAmountInput) baseAmountInput.value = '';
+    if (vatRateSelect) vatRateSelect.selectedIndex = 0;
+    if (customRateInput) customRateInput.value = '';
+    if (customRateContainer) customRateContainer.style.display = 'none';
     
     // Reset calculation type to exclusive
-    document.querySelector('input[name="calculation-type"][value="exclusive"]').checked = true;
+    const exclusiveRadio = document.querySelector('input[name="calculation-type"][value="exclusive"]');
+    if (exclusiveRadio) exclusiveRadio.checked = true;
     updateAmountLabel();
     
     // Hide results
@@ -285,15 +308,19 @@ function saveCalculation() {
         userId: VATAX.currentUser?.id
     };
     
-    // Save to local storage (in real app, save to database)
-    const savedCalcs = JSON.parse(localStorage.getItem('vatax_saved_calculations') || '[]');
-    savedCalcs.push(calculation);
-    localStorage.setItem('vatax_saved_calculations', JSON.stringify(savedCalcs));
-    
-    VATCalculator.savedCalculations.push(calculation);
-    
-    showAlert('Calculation saved successfully!', 'success');
-    updateSavedCalculationsList();
+    // Save to local storage
+    try {
+        const savedCalcs = JSON.parse(localStorage.getItem('vatax_saved_calculations') || '[]');
+        savedCalcs.push(calculation);
+        localStorage.setItem('vatax_saved_calculations', JSON.stringify(savedCalcs));
+        
+        VATCalculator.savedCalculations.push(calculation);
+        showAlert('Calculation saved successfully!', 'success');
+        updateSavedCalculationsList();
+    } catch (error) {
+        console.error('Error saving calculation:', error);
+        showAlert('Error saving calculation', 'error');
+    }
 }
 
 function exportToPDF() {
@@ -307,11 +334,9 @@ function exportToPDF() {
         return;
     }
     
-    // Simulate PDF generation
     showAlert('Generating PDF report...', 'info');
     
     setTimeout(() => {
-        // In a real application, this would generate and download a PDF
         const pdfContent = generatePDFContent(VATCalculator.currentCalculation);
         downloadPDF(pdfContent, 'VAT_Calculation_Report.pdf');
         showAlert('PDF report generated successfully!', 'success');
@@ -353,121 +378,28 @@ function addToComparison() {
     }
     
     // Add to comparison list
-    const comparisonList = JSON.parse(localStorage.getItem('vatax_comparison_list') || '[]');
-    comparisonList.push(VATCalculator.currentCalculation);
-    localStorage.setItem('vatax_comparison_list', JSON.stringify(comparisonList));
-    
-    showAlert('Added to comparison list!', 'success');
-}
-
-// Bulk Calculator Functions
-function showBulkCalculator() {
-    if (!VATAX.isProUser) {
-        showUpgradePrompt('bulk calculations');
-        return;
+    try {
+        const comparisonList = JSON.parse(localStorage.getItem('vatax_comparison_list') || '[]');
+        comparisonList.push(VATCalculator.currentCalculation);
+        localStorage.setItem('vatax_comparison_list', JSON.stringify(comparisonList));
+        
+        showAlert('Added to comparison list!', 'success');
+    } catch (error) {
+        console.error('Error adding to comparison:', error);
+        showAlert('Error adding to comparison', 'error');
     }
-    
-    const bulkCalculator = document.getElementById('bulk-calculator');
-    if (bulkCalculator) {
-        bulkCalculator.classList.remove('hidden');
-        addBulkInput();
-    }
-}
-
-function addBulkInput() {
-    const bulkInputs = document.getElementById('bulk-inputs');
-    const inputIndex = VATCalculator.bulkCalculations.length;
-    
-    const inputHtml = `
-        <div class="bulk-input-row mb-4 p-4 border border-gray-200 rounded-lg" data-index="${inputIndex}">
-            <div class="grid grid-cols-3 gap-4">
-                <div>
-                    <label class="form-label">Amount (৳)</label>
-                    <input type="number" class="form-input bulk-amount" placeholder="Enter amount">
-                </div>
-                <div>
-                    <label class="form-label">VAT Rate (%)</label>
-                    <select class="form-input bulk-rate">
-                        <option value="15">15%</option>
-                        <option value="7.5">7.5%</option>
-                        <option value="5">5%</option>
-                        <option value="0">0%</option>
-                    </select>
-                </div>
-                <div class="flex items-end">
-                    <button type="button" onclick="removeBulkInput(${inputIndex})" class="btn-outline-orange">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </div>
-            </div>
-            <div class="bulk-result mt-2 hidden">
-                <div class="text-sm text-gray-600">
-                    VAT: ৳<span class="bulk-vat-amount">0</span> | 
-                    Total: ৳<span class="bulk-total-amount">0</span>
-                </div>
-            </div>
-        </div>
-    `;
-    
-    bulkInputs.insertAdjacentHTML('beforeend', inputHtml);
-    
-    // Add event listeners for the new inputs
-    const newRow = bulkInputs.lastElementChild;
-    const amountInput = newRow.querySelector('.bulk-amount');
-    const rateInput = newRow.querySelector('.bulk-rate');
-    
-    amountInput.addEventListener('input', () => calculateBulkRow(inputIndex));
-    rateInput.addEventListener('change', () => calculateBulkRow(inputIndex));
-    
-    VATCalculator.bulkCalculations.push({});
-}
-
-function removeBulkInput(index) {
-    const row = document.querySelector(`[data-index="${index}"]`);
-    if (row) {
-        row.remove();
-        VATCalculator.bulkCalculations.splice(index, 1);
-    }
-}
-
-function calculateBulkRow(index) {
-    const row = document.querySelector(`[data-index="${index}"]`);
-    if (!row) return;
-    
-    const amountInput = row.querySelector('.bulk-amount');
-    const rateInput = row.querySelector('.bulk-rate');
-    const resultDiv = row.querySelector('.bulk-result');
-    
-    const amount = parseFloat(amountInput.value);
-    const rate = parseFloat(rateInput.value);
-    
-    if (isNaN(amount) || amount <= 0) {
-        resultDiv.classList.add('hidden');
-        return;
-    }
-    
-    const vatAmount = (amount * rate) / 100;
-    const totalAmount = amount + vatAmount;
-    
-    row.querySelector('.bulk-vat-amount').textContent = formatNumber(vatAmount);
-    row.querySelector('.bulk-total-amount').textContent = formatNumber(totalAmount);
-    resultDiv.classList.remove('hidden');
-    
-    // Update bulk calculation data
-    VATCalculator.bulkCalculations[index] = {
-        baseAmount: amount,
-        vatRate: rate,
-        vatAmount: vatAmount,
-        totalAmount: totalAmount
-    };
 }
 
 // Helper Functions
 function loadSavedVATCalculations() {
     if (VATAX.isProUser) {
-        const savedCalcs = JSON.parse(localStorage.getItem('vatax_saved_calculations') || '[]');
-        VATCalculator.savedCalculations = savedCalcs.filter(calc => calc.calculationType);
-        updateSavedCalculationsList();
+        try {
+            const savedCalcs = JSON.parse(localStorage.getItem('vatax_saved_calculations') || '[]');
+            VATCalculator.savedCalculations = savedCalcs.filter(calc => calc.calculationType);
+            updateSavedCalculationsList();
+        } catch (error) {
+            console.error('Error loading saved calculations:', error);
+        }
     }
 }
 
@@ -476,8 +408,7 @@ function updateSavedCalculationsList() {
     if (!recentCalculations || !VATAX.isProUser) return;
     
     if (VATCalculator.savedCalculations.length > 0) {
-        recentCalculations.classList.remove('hidden');
-        // Update table with saved calculations
+        recentCalculations.style.display = 'block';
         updateCalculationsTable();
     }
 }
@@ -496,16 +427,9 @@ function updateCalculationsTable() {
             <td>৳${formatNumber(calc.vatAmount)}</td>
             <td>৳${formatNumber(calc.totalAmount)}</td>
             <td>
-                <div class="flex space-x-2">
-                    <button onclick="viewCalculationDetails('${calc.id}')" class="text-green hover:text-green-dark" title="View">
-                        <i class="fas fa-eye"></i>
-                    </button>
-                    <button onclick="downloadCalculationPDF('${calc.id}')" class="text-orange hover:text-orange-dark" title="Download">
-                        <i class="fas fa-download"></i>
-                    </button>
-                    <button onclick="emailCalculation('${calc.id}')" class="text-navy hover:text-navy-dark" title="Email">
-                        <i class="fas fa-envelope"></i>
-                    </button>
+                <div style="display: flex; gap: 8px;">
+                    <button onclick="viewCalculationDetails('${calc.id}')" class="view-btn" title="View">View</button>
+                    <button onclick="downloadCalculationPDF('${calc.id}')" class="download-btn" title="Download">Download</button>
                 </div>
             </td>
         </tr>
@@ -514,15 +438,15 @@ function updateCalculationsTable() {
 
 function updateVATFormState() {
     // Enable/disable pro features based on user subscription
-    const proButtons = document.querySelectorAll('#pro-features button');
+    const proButtons = document.querySelectorAll('.pro-feature-btn');
     
     proButtons.forEach(button => {
         if (VATAX.isProUser) {
             button.disabled = false;
-            button.classList.remove('opacity-50');
+            button.style.opacity = '1';
         } else {
             button.disabled = true;
-            button.classList.add('opacity-50');
+            button.style.opacity = '0.5';
         }
     });
 }
@@ -532,7 +456,7 @@ function showUpgradePrompt(feature) {
     
     setTimeout(() => {
         if (confirm(`Would you like to upgrade to Pro to access ${feature}?`)) {
-            window.location.href = 'pricing.html';
+            window.location.href = 'pricing.html?upgrade=true';
         }
     }, 1000);
 }
@@ -581,6 +505,14 @@ function debounce(func, wait) {
     };
 }
 
+// Netlify-specific fixes
+function setupVATCalculatorSPA() {
+    // Handle SPA navigation for VAT calculator
+    if (window.location.hash === '#vat-calculator') {
+        initializeVATCalculator();
+    }
+}
+
 // Export functions to global scope
 window.calculateVAT = calculateVAT;
 window.clearCalculation = clearCalculation;
@@ -588,5 +520,11 @@ window.saveCalculation = saveCalculation;
 window.exportToPDF = exportToPDF;
 window.emailReport = emailReport;
 window.addToComparison = addToComparison;
-window.addBulkInput = addBulkInput;
-window.removeBulkInput = removeBulkInput;
+window.VATCalculator = VATCalculator;
+
+// Initialize when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeVATCalculator);
+} else {
+    initializeVATCalculator();
+}
