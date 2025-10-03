@@ -6,9 +6,766 @@
     <title>VATAX - Smart VAT & Tax Calculator for Bangladesh</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/calculator.css">
-    <link rel="icon" href="images/favicon.ico">
+    <style>
+        /* ===== RESET & BASE STYLES ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #FF9933;
+            --primary-dark: #FF6600;
+            --secondary: #1e3a8a;
+            --success: #10B981;
+            --danger: #EF4444;
+            --warning: #F59E0B;
+            --info: #3B82F6;
+            --dark: #1F2937;
+            --light: #F3F4F6;
+            --white: #FFFFFF;
+            --gray-100: #F9FAFB;
+            --gray-200: #E5E7EB;
+            --gray-300: #D1D5DB;
+            --gray-400: #9CA3AF;
+            --gray-500: #6B7280;
+            --gray-600: #4B5563;
+            --gray-700: #374151;
+            --gray-800: #1F2937;
+            --gray-900: #111827;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: var(--gray-800);
+            background: var(--white);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* ===== NAVIGATION ===== */
+        .navbar {
+            background: var(--white);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo i {
+            font-size: 2rem;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 2.5rem;
+            align-items: center;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--gray-700);
+            font-weight: 500;
+            font-size: 1rem;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--primary);
+        }
+
+        .nav-auth {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .btn-login {
+            padding: 0.6rem 1.5rem;
+            border: 2px solid var(--primary);
+            background: transparent;
+            color: var(--primary);
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-login:hover {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        .btn-signup {
+            padding: 0.6rem 1.5rem;
+            background: var(--primary);
+            color: var(--white);
+            border: 2px solid var(--primary);
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-signup:hover {
+            background: var(--primary-dark);
+            border-color: var(--primary-dark);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+        }
+
+        /* Language Switcher */
+        .language-switcher {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-right: 1rem;
+        }
+
+        .language-switcher select {
+            padding: 0.4rem;
+            border: 1px solid var(--gray-300);
+            border-radius: 4px;
+            background: var(--white);
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* ===== HERO SECTION ===== */
+        .hero {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: var(--white);
+            padding: 140px 0 80px;
+            margin-top: 70px;
+        }
+
+        .hero-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .hero-title {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+        }
+
+        .hero-description {
+            font-size: 1.2rem;
+            margin-bottom: 2.5rem;
+            opacity: 0.9;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .btn-primary {
+            background: var(--white);
+            color: var(--primary);
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--white);
+            padding: 1rem 2rem;
+            border: 2px solid var(--white);
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: var(--white);
+            color: var(--primary);
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 3rem;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        /* ===== CALCULATOR PREVIEW ===== */
+        .calculator-preview {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            color: var(--gray-800);
+        }
+
+        .calc-tabs {
+            display: flex;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--gray-200);
+        }
+
+        .calc-tab {
+            padding: 0.8rem 1rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--gray-600);
+            font-weight: 600;
+        }
+
+        .calc-tab.active {
+            color: var(--primary);
+            border-bottom: 2px solid var(--primary);
+        }
+
+        .calc-content {
+            display: block;
+        }
+
+        .calc-content.hidden {
+            display: none;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--gray-700);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid var(--gray-300);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .btn-calculate {
+            width: 100%;
+            background: var(--primary);
+            color: var(--white);
+            padding: 1rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 1.5rem;
+            transition: background 0.3s ease;
+        }
+
+        .btn-calculate:hover {
+            background: var(--primary-dark);
+        }
+
+        .calc-result {
+            background: var(--success);
+            color: var(--white);
+            padding: 1.5rem;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .calc-result.show {
+            display: block;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .result-item strong {
+            font-size: 1.1rem;
+        }
+
+        /* ===== FEATURES SECTION ===== */
+        .features {
+            padding: 80px 0;
+            background: var(--gray-100);
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 3rem;
+            color: var(--gray-800);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background: var(--white);
+            padding: 2rem;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .feature-card h3 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        /* ===== PRICING SECTION ===== */
+        .pricing-preview {
+            padding: 80px 0;
+            background: var(--white);
+        }
+
+        .pricing-switch {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 3rem;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--gray-300);
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: var(--white);
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--primary);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        .save-badge {
+            background: var(--success);
+            color: var(--white);
+            padding: 0.2rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .pricing-card {
+            background: var(--white);
+            padding: 2rem;
+            border-radius: 10px;
+            border: 2px solid var(--gray-200);
+            text-align: center;
+        }
+
+        .pricing-card.featured {
+            border-color: var(--primary);
+            transform: scale(1.05);
+        }
+
+        .popular-badge {
+            background: var(--primary);
+            color: var(--white);
+            padding: 0.5rem 1rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: inline-block;
+        }
+
+        .pricing-header {
+            margin-bottom: 1.5rem;
+        }
+
+        .pricing-header h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .price-free {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--success);
+            margin: 1rem 0;
+        }
+
+        .price {
+            margin: 1rem 0;
+        }
+
+        .price-amount {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--gray-800);
+        }
+
+        .price-period {
+            font-size: 1rem;
+            color: var(--gray-600);
+        }
+
+        .pricing-features {
+            list-style: none;
+            margin: 2rem 0;
+            text-align: left;
+        }
+
+        .pricing-features li {
+            margin-bottom: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .pricing-features li i {
+            color: var(--success);
+        }
+
+        .pricing-features li i.fa-times {
+            color: var(--gray-400);
+        }
+
+        .btn-outline {
+            width: 100%;
+            background: transparent;
+            color: var(--primary);
+            padding: 1rem;
+            border: 2px solid var(--primary);
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline:hover {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        /* ===== FAQ SECTION ===== */
+        .faq {
+            padding: 80px 0;
+            background: var(--gray-100);
+        }
+
+        .faq-grid {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .faq-item {
+            background: var(--white);
+            margin-bottom: 1rem;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .faq-question {
+            padding: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+        }
+
+        .faq-answer {
+            padding: 0 1.5rem 1.5rem;
+            display: none;
+            color: var(--gray-600);
+        }
+
+        /* ===== CTA SECTION ===== */
+        .cta {
+            background: var(--secondary);
+            color: var(--white);
+            padding: 80px 0;
+            text-align: center;
+        }
+
+        .cta h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .cta-buttons {
+            margin-top: 2rem;
+        }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            background: var(--gray-900);
+            color: var(--white);
+            padding: 40px 0 20px;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .footer-section a {
+            color: var(--gray-400);
+            text-decoration: none;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid var(--gray-800);
+            color: var(--gray-500);
+        }
+
+        /* ===== MODALS ===== */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+        }
+
+        .modal-content {
+            background: var(--white);
+            margin: 5% auto;
+            padding: 2rem;
+            border-radius: 10px;
+            max-width: 400px;
+            position: relative;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .btn-full {
+            width: 100%;
+        }
+
+        .form-check {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .modal-footer {
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+        /* ===== MOBILE MENU ===== */
+        .mobile-menu {
+            display: none;
+            background: var(--white);
+            padding: 1rem;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+        }
+
+        .mobile-nav-link {
+            display: block;
+            padding: 1rem;
+            text-decoration: none;
+            color: var(--gray-700);
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .mobile-auth {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--gray-200);
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .nav-menu, .nav-auth {
+                display: none;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .hero-container {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .hero-title {
+                font-size: 2rem;
+            }
+
+            .pricing-card.featured {
+                transform: none;
+            }
+
+            .features-grid,
+            .pricing-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
     <!-- Navigation -->
@@ -16,20 +773,20 @@
         <div class="nav-container">
             <div class="nav-logo">
                 <a href="index.html" class="logo">
-                    <img src="images/logo.png" alt="VATAX Logo" class="logo-img">
+                    <i class="fas fa-calculator"></i>
                     VATAX
                 </a>
             </div>
             
-            <div class="nav-menu">
-                <a href="index.html" class="nav-link">Home</a>
-                <a href="vat-calculator.html" class="nav-link">VAT Calculator</a>
-                <a href="tax-calculator.html" class="nav-link">Tax Calculator</a>
-                <a href="pricing.html" class="nav-link">Pricing</a>
-                <a href="faq.html" class="nav-link">FAQ</a>
+            <div class="nav-menu" id="nav-menu">
+                <a href="index.html" class="nav-link" data-i18n="nav.home">Home</a>
+                <a href="vat-calculator.html" class="nav-link" data-i18n="nav.vat">VAT Calculator</a>
+                <a href="tax-calculator.html" class="nav-link" data-i18n="nav.tax">Tax Calculator</a>
+                <a href="pricing.html" class="nav-link" data-i18n="nav.pricing">Pricing</a>
+                <a href="faq.html" class="nav-link" data-i18n="nav.faq">FAQ</a>
             </div>
 
-            <div class="nav-auth">
+            <div class="nav-auth" id="auth-buttons">
                 <div class="language-switcher">
                     <i class="fas fa-globe"></i>
                     <select id="language-select">
@@ -37,8 +794,8 @@
                         <option value="bn">বাংলা</option>
                     </select>
                 </div>
-                <button class="btn-login" onclick="showLogin()">Login</button>
-                <button class="btn-signup" onclick="showSignup()">Sign Up</button>
+                <button class="btn-login" onclick="showLogin()" data-i18n="nav.login">Login</button>
+                <button class="btn-signup" onclick="showSignup()" data-i18n="nav.signup">Sign Up</button>
             </div>
 
             <div class="mobile-menu-btn">
@@ -51,21 +808,21 @@
 
     <!-- Mobile Menu -->
     <div class="mobile-menu hidden" id="mobile-menu">
-        <div class="language-switcher" style="padding: 1rem; border-bottom: 1px solid var(--border-light);">
+        <div class="language-switcher" style="padding: 1rem; border-bottom: 1px solid var(--gray-200);">
             <i class="fas fa-globe"></i>
             <select id="mobile-language-select">
                 <option value="en">English</option>
                 <option value="bn">বাংলা</option>
             </select>
         </div>
-        <a href="index.html" class="mobile-nav-link">Home</a>
-        <a href="vat-calculator.html" class="mobile-nav-link">VAT Calculator</a>
-        <a href="tax-calculator.html" class="mobile-nav-link">Tax Calculator</a>
-        <a href="pricing.html" class="mobile-nav-link">Pricing</a>
-        <a href="faq.html" class="mobile-nav-link">FAQ</a>
+        <a href="index.html" class="mobile-nav-link" data-i18n="nav.home">Home</a>
+        <a href="vat-calculator.html" class="mobile-nav-link" data-i18n="nav.vat">VAT Calculator</a>
+        <a href="tax-calculator.html" class="mobile-nav-link" data-i18n="nav.tax">Tax Calculator</a>
+        <a href="pricing.html" class="mobile-nav-link" data-i18n="nav.pricing">Pricing</a>
+        <a href="faq.html" class="mobile-nav-link" data-i18n="nav.faq">FAQ</a>
         <div class="mobile-auth">
-            <button class="btn-login" onclick="showLogin()">Login</button>
-            <button class="btn-signup" onclick="showSignup()">Sign Up</button>
+            <button class="btn-login" onclick="showLogin()" data-i18n="nav.login">Login</button>
+            <button class="btn-signup" onclick="showSignup()" data-i18n="nav.signup">Sign Up</button>
         </div>
     </div>
 
@@ -74,50 +831,50 @@
         <div class="container">
             <div class="hero-container">
                 <div class="hero-content">
-                    <h1 class="hero-title">Smart VAT & Tax Calculator for Bangladesh</h1>
-                    <p class="hero-description">Calculate VAT, income tax, and manage your finances with our powerful calculator designed specifically for Bangladeshi taxpayers.</p>
+                    <h1 class="hero-title" data-i18n="hero.title">Smart VAT & Tax Calculator for Bangladesh</h1>
+                    <p class="hero-description" data-i18n="hero.description">Calculate VAT, income tax, and manage your finances with our powerful calculator designed specifically for Bangladeshi taxpayers.</p>
                     <div class="hero-buttons">
                         <button class="btn-primary" onclick="showSignup()">
-                            <i class="fas fa-rocket"></i>Get Started Free
+                            <i class="fas fa-rocket"></i><span data-i18n="hero.getStarted">Get Started Free</span>
                         </button>
                         <button class="btn-secondary" onclick="document.getElementById('features').scrollIntoView({behavior: 'smooth'})">
-                            <i class="fas fa-play-circle"></i>How It Works
+                            <i class="fas fa-play-circle"></i><span data-i18n="hero.howItWorks">How It Works</span>
                         </button>
                     </div>
                     <div class="hero-stats">
                         <div class="stat">
                             <div class="stat-number">10,000+</div>
-                            <div class="stat-label">Calculations</div>
+                            <div class="stat-label" data-i18n="hero.calculations">Calculations</div>
                         </div>
                         <div class="stat">
                             <div class="stat-number">95%</div>
-                            <div class="stat-label">Accuracy</div>
+                            <div class="stat-label" data-i18n="hero.accuracy">Accuracy</div>
                         </div>
                         <div class="stat">
                             <div class="stat-number">24/7</div>
-                            <div class="stat-label">Support</div>
+                            <div class="stat-label" data-i18n="hero.support">Support</div>
                         </div>
                     </div>
                 </div>
                 <div class="hero-image">
                     <div class="calculator-preview">
                         <div class="calc-header">
-                            <h3>Quick Calculator</h3>
+                            <h3 data-i18n="calculator.title">Quick Calculator</h3>
                         </div>
                         <div class="calc-body">
                             <div class="calc-tabs">
-                                <button class="calc-tab active" onclick="switchCalcTab('vat')">VAT</button>
-                                <button class="calc-tab" onclick="switchCalcTab('tax')">Income Tax</button>
+                                <button class="calc-tab active" onclick="switchCalcTab('vat')" data-i18n="calculator.vat">VAT</button>
+                                <button class="calc-tab" onclick="switchCalcTab('tax')" data-i18n="calculator.tax">Income Tax</button>
                             </div>
                             
                             <!-- VAT CALCULATOR SECTION -->
                             <div class="calc-content" id="vat-calc">
                                 <div class="form-group">
-                                    <label>Amount (৳)</label>
+                                    <label data-i18n="calculator.amount">Amount (৳)</label>
                                     <input type="number" id="quick-vat-amount" class="form-input" placeholder="Enter amount" value="1000">
                                 </div>
                                 <div class="form-group">
-                                    <label>VAT Rate</label>
+                                    <label data-i18n="calculator.vatRate">VAT Rate</label>
                                     <select id="quick-vat-rate" class="form-input">
                                         <option value="15">Standard Rate - 15%</option>
                                         <option value="7.5">Reduced Rate - 7.5%</option>
@@ -127,20 +884,20 @@
                                     </select>
                                 </div>
                                 <div class="form-group hidden" id="custom-rate-container">
-                                    <label>Custom VAT Rate (%)</label>
+                                    <label data-i18n="calculator.customRate">Custom VAT Rate (%)</label>
                                     <input type="number" id="custom-vat-rate" class="form-input" placeholder="Enter custom rate" min="0" max="100">
                                 </div>
                                 <button class="btn-calculate" onclick="calculateQuickVAT()">
-                                    <i class="fas fa-calculator"></i>Calculate VAT
+                                    <i class="fas fa-calculator"></i><span data-i18n="calculator.calculateVAT">Calculate VAT</span>
                                 </button>
                                 
                                 <div class="calc-result" id="quick-vat-result">
                                     <div class="result-item">
-                                        <span>VAT Amount:</span>
+                                        <span data-i18n="calculator.vatAmount">VAT Amount:</span>
                                         <strong id="quick-vat-amount-result">0 ৳</strong>
                                     </div>
                                     <div class="result-item">
-                                        <span>Total Amount:</span>
+                                        <span data-i18n="calculator.totalAmount">Total Amount:</span>
                                         <strong id="quick-vat-total-result">0 ৳</strong>
                                     </div>
                                 </div>
@@ -148,20 +905,20 @@
                             
                             <div class="calc-content hidden" id="tax-calc">
                                 <div class="form-group">
-                                    <label>Annual Income (৳)</label>
+                                    <label data-i18n="calculator.annualIncome">Annual Income (৳)</label>
                                     <input type="number" id="quick-tax-income" class="form-input" placeholder="Enter income" value="500000">
                                 </div>
                                 <button class="btn-calculate" onclick="calculateQuickTax()">
-                                    <i class="fas fa-calculator"></i>Calculate Tax
+                                    <i class="fas fa-calculator"></i><span data-i18n="calculator.calculateTax">Calculate Tax</span>
                                 </button>
                                 
                                 <div class="calc-result" id="quick-tax-result">
                                     <div class="result-item">
-                                        <span>Taxable Income:</span>
+                                        <span data-i18n="calculator.taxableIncome">Taxable Income:</span>
                                         <strong id="quick-taxable-income">0 ৳</strong>
                                     </div>
                                     <div class="result-item">
-                                        <span>Tax Amount:</span>
+                                        <span data-i18n="calculator.taxAmount">Tax Amount:</span>
                                         <strong id="quick-tax-amount">0 ৳</strong>
                                     </div>
                                 </div>
@@ -176,35 +933,35 @@
     <!-- Features Section -->
     <section id="features" class="features">
         <div class="container">
-            <h2 class="section-title">Why Choose VATAX?</h2>
+            <h2 class="section-title" data-i18n="features.title">Why Choose VATAX?</h2>
             <div class="features-grid">
                 <div class="feature-card">
                     <div class="feature-icon">
                         <i class="fas fa-bolt"></i>
                     </div>
-                    <h3>Fast Calculations</h3>
-                    <p>Calculate VAT and tax instantly with our optimized algorithms</p>
+                    <h3 data-i18n="features.fast">Fast Calculations</h3>
+                    <p data-i18n="features.fastDesc">Calculate VAT and tax instantly with our optimized algorithms</p>
                 </div>
                 <div class="feature-card">
                     <div class="feature-icon">
                         <i class="fas fa-chart-line"></i>
                     </div>
-                    <h3>Bangladesh Specific</h3>
-                    <p>Designed specifically for Bangladeshi tax laws and rates</p>
+                    <h3 data-i18n="features.bdSpecific">Bangladesh Specific</h3>
+                    <p data-i18n="features.bdSpecificDesc">Designed specifically for Bangladeshi tax laws and rates</p>
                 </div>
                 <div class="feature-card">
                     <div class="feature-icon">
                         <i class="fas fa-shield-alt"></i>
                     </div>
-                    <h3>100% Accurate</h3>
-                    <p>Based on latest NBR tax slabs and VAT regulations</p>
+                    <h3 data-i18n="features.accurate">100% Accurate</h3>
+                    <p data-i18n="features.accurateDesc">Based on latest NBR tax slabs and VAT regulations</p>
                 </div>
                 <div class="feature-card">
                     <div class="feature-icon">
                         <i class="fas fa-mobile-alt"></i>
                     </div>
-                    <h3>Mobile Friendly</h3>
-                    <p>Works perfectly on all devices - desktop, tablet, mobile</p>
+                    <h3 data-i18n="features.mobile">Mobile Friendly</h3>
+                    <p data-i18n="features.mobileDesc">Works perfectly on all devices - desktop, tablet, mobile</p>
                 </div>
             </div>
         </div>
@@ -213,64 +970,64 @@
     <!-- Pricing Preview -->
     <section class="pricing-preview">
         <div class="container">
-            <h2 class="section-title">Simple, Transparent Pricing</h2>
+            <h2 class="section-title" data-i18n="pricing.title">Simple, Transparent Pricing</h2>
             <div class="pricing-switch">
-                <span>Monthly</span>
+                <span data-i18n="pricing.monthly">Monthly</span>
                 <label class="switch">
                     <input type="checkbox" id="billing-toggle">
                     <span class="slider"></span>
                 </label>
-                <span>Yearly <span class="save-badge">Save 17%</span></span>
+                <span data-i18n="pricing.yearly">Yearly <span class="save-badge" data-i18n="pricing.save">Save 17%</span></span>
             </div>
             
             <div class="pricing-grid">
                 <div class="pricing-card">
                     <div class="pricing-header">
-                        <h3>Free</h3>
-                        <div class="price-free">Free Forever</div>
+                        <h3 data-i18n="pricing.free">Free</h3>
+                        <div class="price-free" data-i18n="pricing.freePrice">Free Forever</div>
                     </div>
                     <ul class="pricing-features">
-                        <li><i class="fas fa-check"></i> Basic VAT Calculator</li>
-                        <li><i class="fas fa-check"></i> Basic Tax Calculator</li>
-                        <li><i class="fas fa-check"></i> 5 Calculations per month</li>
-                        <li><i class="fas fa-times"></i> Save History</li>
-                        <li><i class="fas fa-times"></i> PDF Reports</li>
+                        <li><i class="fas fa-check"></i> <span data-i18n="pricing.free1">Basic VAT Calculator</span></li>
+                        <li><i class="fas fa-check"></i> <span data-i18n="pricing.free2">Basic Tax Calculator</span></li>
+                        <li><i class="fas fa-check"></i> <span data-i18n="pricing.free3">5 Calculations per month</span></li>
+                        <li><i class="fas fa-times"></i> <span data-i18n="pricing.free4">Save History</span></li>
+                        <li><i class="fas fa-times"></i> <span data-i18n="pricing.free5">PDF Reports</span></li>
                     </ul>
-                    <button class="btn-outline" onclick="showSignup()">Get Started Free</button>
+                    <button class="btn-outline" onclick="showSignup()" data-i18n="pricing.getStartedFree">Get Started Free</button>
                 </div>
                 
                 <div class="pricing-card featured">
-                    <div class="popular-badge">MOST POPULAR</div>
+                    <div class="popular-badge" data-i18n="pricing.mostPopular">MOST POPULAR</div>
                     <div class="pricing-header">
-                        <h3>Pro</h3>
+                        <h3 data-i18n="pricing.pro">Pro</h3>
                         <div class="price">
                             <span class="price-amount">99</span>
-                            <span class="price-period">/month</span>
+                            <span class="price-period" data-i18n="pricing.perMonth">/month</span>
                         </div>
                     </div>
                     <ul class="pricing-features">
-                        <li><i class="fas fa-check"></i> All Free Features</li>
-                        <li><i class="fas fa-check"></i> Unlimited Calculations</li>
-                        <li><i class="fas fa-check"></i> Save Calculation History</li>
-                        <li><i class="fas fa-check"></i> PDF Export</li>
-                        <li><i class="fas fa-check"></i> Email Reports</li>
+                        <li><i class="fas fa-check"></i> <span data-i18n="pricing.pro1">All Free Features</span></li>
+                        <li><i class="fas fa-check"></i> <span data-i18n="pricing.pro2">Unlimited Calculations</span></li>
+                        <li><i class="fas fa-check"></i> <span data-i18n="pricing.pro3">Save Calculation History</span></li>
+                        <li><i class="fas fa-check"></i> <span data-i18n="pricing.pro4">PDF Export</span></li>
+                        <li><i class="fas fa-check"></i> <span data-i18n="pricing.pro5">Email Reports</span></li>
                     </ul>
-                    <button class="btn-primary" onclick="upgradeToPro()">Start 7-Day Free Trial</button>
+                    <button class="btn-primary" onclick="upgradeToPro()" data-i18n="pricing.startTrial">Start 7-Day Free Trial</button>
                 </div>
                 
                 <div class="pricing-card">
                     <div class="pricing-header">
-                        <h3>Enterprise</h3>
-                        <div class="price-free">Custom Pricing</div>
+                        <h3 data-i18n="pricing.enterprise">Enterprise</h3>
+                        <div class="price-free" data-i18n="pricing.custom">Custom Pricing</div>
                     </div>
                     <ul class="pricing-features">
-                        <li><i class="fas fa-check"></i> All Pro Features</li>
-                        <li><i class="fas fa-check"></i> Multi-user Access</li>
-                        <li><i class="fas fa-check"></i> API Access</li>
-                        <li><i class="fas fa-check"></i> Custom Reports</li>
-                        <li><i class="fas fa-check"></i> Dedicated Support</li>
+                        <li><i class="fas fa-check"></i> <span data-i18n="pricing.enterprise1">All Pro Features</span></li>
+                        <li><i class="fas fa-check"></i> <span data-i18n="pricing.enterprise2">Multi-user Access</span></li>
+                        <li><i class="fas fa-check"></i> <span data-i18n="pricing.enterprise3">API Access</span></li>
+                        <li><i class="fas fa-check"></i> <span data-i18n="pricing.enterprise4">Custom Reports</span></li>
+                        <li><i class="fas fa-check"></i> <span data-i18n="pricing.enterprise5">Dedicated Support</span></li>
                     </ul>
-                    <button class="btn-outline" onclick="contactSales()">Contact Sales</button>
+                    <button class="btn-outline" onclick="contactSales()" data-i18n="pricing.contactSales">Contact Sales</button>
                 </div>
             </div>
         </div>
@@ -279,106 +1036,42 @@
     <!-- FAQ Section -->
     <section class="faq">
         <div class="container">
-            <h2 class="section-title">Frequently Asked Questions</h2>
+            <h2 class="section-title" data-i18n="faq.title">Frequently Asked Questions</h2>
             <div class="faq-grid">
                 <div class="faq-item">
                     <div class="faq-question">
-                        <span>How accurate is the tax calculation?</span>
+                        <span data-i18n="faq.q1">How accurate is the tax calculation?</span>
                         <i class="fas fa-plus"></i>
                     </div>
                     <div class="faq-answer">
-                        <p>Our calculations are based on the latest NBR tax slabs and VAT regulations for Bangladesh. We update our system regularly to ensure 100% accuracy.</p>
+                        <p data-i18n="faq.a1">Our calculations are based on the latest NBR tax slabs and VAT regulations. We update our system whenever there are changes in tax laws to ensure 100% accuracy.</p>
                     </div>
                 </div>
-                
                 <div class="faq-item">
                     <div class="faq-question">
-                        <span>Is my financial data safe?</span>
+                        <span data-i18n="faq.q2">Can I use this for business purposes?</span>
                         <i class="fas fa-plus"></i>
                     </div>
                     <div class="faq-answer">
-                        <p>Yes! We don't store any sensitive financial data on our servers. All calculations are done locally in your browser.</p>
+                        <p data-i18n="faq.a2">Yes! Many businesses in Bangladesh use our calculator for their daily VAT and tax calculations. Our Pro plan offers additional features suitable for business use.</p>
                     </div>
                 </div>
-                
                 <div class="faq-item">
                     <div class="faq-question">
-                        <span>Can I use VATAX for business purposes?</span>
+                        <span data-i18n="faq.q3">Is my financial data safe?</span>
                         <i class="fas fa-plus"></i>
                     </div>
                     <div class="faq-answer">
-                        <p>Absolutely! Many businesses in Bangladesh use VATAX for their daily VAT and tax calculations. Our Pro plan offers additional business features.</p>
+                        <p data-i18n="faq.a3">We take data security seriously. All your calculations and data are encrypted and stored securely. We never share your financial information with third parties.</p>
                     </div>
                 </div>
-                
                 <div class="faq-item">
                     <div class="faq-question">
-                        <span>Do you support mobile devices?</span>
+                        <span data-i18n="faq.q4">Do you offer refunds?</span>
                         <i class="fas fa-plus"></i>
                     </div>
                     <div class="faq-answer">
-                        <p>Yes, VATAX is fully responsive and works perfectly on smartphones, tablets, and desktop computers.</p>
-                    </div>
-                </div>
-                
-                <!-- New FAQ Items -->
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <span>What are the current VAT rates in Bangladesh?</span>
-                        <i class="fas fa-plus"></i>
-                    </div>
-                    <div class="faq-answer">
-                        <p>The standard VAT rate in Bangladesh is 15%. However, there are reduced rates of 7.5%, 5%, and 0% for specific goods and services as per NBR regulations.</p>
-                    </div>
-                </div>
-                
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <span>What are the tax-free income limits for FY 2024-25?</span>
-                        <i class="fas fa-plus"></i>
-                    </div>
-                    <div class="faq-answer">
-                        <p>For FY 2024-25, the tax-free income limit is ৳350,000 for general taxpayers. For women, senior citizens (65+), and disabled persons, the limit is ৳400,000.</p>
-                    </div>
-                </div>
-                
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <span>How is VAT calculated on inclusive vs exclusive basis?</span>
-                        <i class="fas fa-plus"></i>
-                    </div>
-                    <div class="faq-answer">
-                        <p>VAT can be calculated on exclusive basis (VAT added to base price) or inclusive basis (VAT included in price). Our calculator supports both methods with clear options.</p>
-                    </div>
-                </div>
-                
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <span>What investment deductions are allowed?</span>
-                        <i class="fas fa-plus"></i>
-                    </div>
-                    <div class="faq-answer">
-                        <p>You can claim deductions for investments in approved savings certificates, life insurance premiums, contributions to recognized provident funds, and investments in government bonds.</p>
-                    </div>
-                </div>
-                
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <span>Is this calculator data accurate and up-to-date?</span>
-                        <i class="fas fa-plus"></i>
-                    </div>
-                    <div class="faq-answer">
-                        <p>Yes, our calculator uses the latest NBR tax slabs and VAT rates. We regularly update our system whenever there are changes in tax laws or rates.</p>
-                    </div>
-                </div>
-                
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <span>What pro features are coming soon?</span>
-                        <i class="fas fa-plus"></i>
-                    </div>
-                    <div class="faq-answer">
-                        <p>We're working on advanced features like multi-year tax planning, business expense tracking, automated tax filing assistance, and integration with accounting software.</p>
+                        <p data-i18n="faq.a4">Yes, we offer a 7-day money-back guarantee for all paid plans. If you're not satisfied, you can request a full refund within 7 days of purchase.</p>
                     </div>
                 </div>
             </div>
@@ -388,17 +1081,10 @@
     <!-- CTA Section -->
     <section class="cta">
         <div class="container">
-            <div class="cta-content">
-                <h2>Ready to Simplify Your Tax Calculations?</h2>
-                <p>Join thousands of Bangladeshi users who trust VATAX for accurate VAT and tax calculations.</p>
-                <div class="cta-buttons">
-                    <button class="btn-primary" onclick="showSignup()">
-                        <i class="fas fa-rocket"></i>Start Calculating Free
-                    </button>
-                    <button class="btn-outline" onclick="tryCalculator()">
-                        <i class="fas fa-calculator"></i>Try Calculator
-                    </button>
-                </div>
+            <h2 data-i18n="cta.title">Ready to Simplify Your Tax Calculations?</h2>
+            <p data-i18n="cta.description">Join thousands of Bangladeshi taxpayers who trust VATAX for accurate and fast calculations.</p>
+            <div class="cta-buttons">
+                <button class="btn-primary" onclick="showSignup()" data-i18n="cta.startFree">Start Free Trial</button>
             </div>
         </div>
     </section>
@@ -409,107 +1095,593 @@
             <div class="footer-content">
                 <div class="footer-section">
                     <div class="footer-logo">
-                        <img src="images/logo.png" alt="VATAX Logo" class="footer-logo-img">
+                        <i class="fas fa-calculator"></i>
                         VATAX
                     </div>
-                    <p>Smart VAT & Tax Calculator for Bangladesh</p>
+                    <p data-i18n="footer.description">Smart VAT & Tax Calculator for Bangladesh. Accurate, fast, and reliable calculations for individuals and businesses.</p>
                 </div>
-                
                 <div class="footer-section">
-                    <h4>Quick Links</h4>
-                    <a href="index.html">Home</a>
-                    <a href="vat-calculator.html">VAT Calculator</a>
-                    <a href="tax-calculator.html">Tax Calculator</a>
-                    <a href="pricing.html">Pricing</a>
+                    <h4 data-i18n="footer.product">Product</h4>
+                    <a href="vat-calculator.html" data-i18n="nav.vat">VAT Calculator</a>
+                    <a href="tax-calculator.html" data-i18n="nav.tax">Tax Calculator</a>
+                    <a href="pricing.html" data-i18n="nav.pricing">Pricing</a>
                 </div>
-                
                 <div class="footer-section">
-                    <h4>Support</h4>
-                    <a href="faq.html">FAQ</a>
-                    <a href="contact.html">Contact</a>
-                    <a href="privacy.html">Privacy Policy</a>
-                    <a href="terms.html">Terms of Service</a>
+                    <h4 data-i18n="footer.company">Company</h4>
+                    <a href="about.html" data-i18n="footer.about">About Us</a>
+                    <a href="contact.html" data-i18n="footer.contact">Contact</a>
+                    <a href="privacy.html" data-i18n="footer.privacy">Privacy Policy</a>
+                    <a href="terms.html" data-i18n="footer.terms">Terms of Service</a>
                 </div>
-                
                 <div class="footer-section">
-                    <h4>Connect</h4>
+                    <h4 data-i18n="footer.support">Support</h4>
+                    <a href="faq.html" data-i18n="nav.faq">FAQ</a>
+                    <a href="help.html" data-i18n="footer.help">Help Center</a>
                     <div class="social-links">
                         <a href="#"><i class="fab fa-facebook"></i></a>
                         <a href="#"><i class="fab fa-twitter"></i></a>
                         <a href="#"><i class="fab fa-linkedin"></i></a>
-                        <a href="#"><i class="fab fa-github"></i></a>
                     </div>
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2024 VATAX. All rights reserved. Designed for Bangladesh.</p>
+                <p>&copy; 2024 VATAX. <span data-i18n="footer.rights">All rights reserved.</span></p>
             </div>
         </div>
     </footer>
 
     <!-- Login Modal -->
-    <div id="login-modal" class="modal hidden">
+    <div id="login-modal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Login to VATAX</h2>
-                <button class="modal-close" onclick="closeModal('login-modal')">
-                    <i class="fas fa-times"></i>
-                </button>
+                <h2 data-i18n="login.title">Login to VATAX</h2>
+                <button class="modal-close" onclick="closeLogin()">&times;</button>
             </div>
             <form id="login-form">
                 <div class="form-group">
-                    <label>Email or Mobile Number</label>
-                    <input type="text" id="login-identifier" class="form-input" placeholder="Enter your email or mobile number" required>
+                    <label data-i18n="login.email">Email Address</label>
+                    <input type="email" class="form-input" placeholder="Enter your email" required>
                 </div>
                 <div class="form-group">
-                    <label>Password</label>
-                    <input type="password" id="login-password" class="form-input" placeholder="Enter your password" required>
+                    <label data-i18n="login.password">Password</label>
+                    <input type="password" class="form-input" placeholder="Enter your password" required>
                 </div>
-                <button type="submit" class="btn-primary btn-full">Login</button>
+                <div class="form-check">
+                    <input type="checkbox" id="remember-me">
+                    <label for="remember-me" data-i18n="login.remember">Remember me</label>
+                </div>
+                <button type="submit" class="btn-primary btn-full" data-i18n="login.login">Login</button>
             </form>
             <div class="modal-footer">
-                <p>Don't have an account? <a href="#" onclick="closeModal('login-modal'); showSignup();">Sign up</a></p>
+                <p data-i18n="login.noAccount">Don't have an account? <a href="#" onclick="closeLogin(); showSignup();" data-i18n="login.signup">Sign up</a></p>
             </div>
         </div>
     </div>
 
     <!-- Signup Modal -->
-    <div id="signup-modal" class="modal hidden">
+    <div id="signup-modal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Create VATAX Account</h2>
-                <button class="modal-close" onclick="closeModal('signup-modal')">
-                    <i class="fas fa-times"></i>
-                </button>
+                <h2 data-i18n="signup.title">Create Account</h2>
+                <button class="modal-close" onclick="closeSignup()">&times;</button>
             </div>
             <form id="signup-form">
                 <div class="form-group">
-                    <label>Full Name</label>
-                    <input type="text" id="signup-name" class="form-input" placeholder="Enter your full name" required>
+                    <label data-i18n="signup.fullName">Full Name</label>
+                    <input type="text" class="form-input" placeholder="Enter your full name" required>
                 </div>
                 <div class="form-group">
-                    <label>Email or Mobile Number</label>
-                    <input type="text" id="signup-identifier" class="form-input" placeholder="Enter your email or mobile number" required>
+                    <label data-i18n="signup.email">Email Address</label>
+                    <input type="email" class="form-input" placeholder="Enter your email" required>
                 </div>
                 <div class="form-group">
-                    <label>Password</label>
-                    <input type="password" id="signup-password" class="form-input" placeholder="Create a password" required>
+                    <label data-i18n="signup.password">Password</label>
+                    <input type="password" class="form-input" placeholder="Create a password" required>
+                </div>
+                <div class="form-group">
+                    <label data-i18n="signup.confirmPassword">Confirm Password</label>
+                    <input type="password" class="form-input" placeholder="Confirm your password" required>
                 </div>
                 <div class="form-check">
-                    <input type="checkbox" id="terms-checkbox" required>
-                    <label for="terms-checkbox">I agree to the <a href="terms.html">Terms of Service</a> and <a href="privacy.html">Privacy Policy</a></label>
+                    <input type="checkbox" id="agree-terms" required>
+                    <label for="agree-terms" data-i18n="signup.agree">I agree to the <a href="terms.html">Terms of Service</a> and <a href="privacy.html">Privacy Policy</a></label>
                 </div>
-                <button type="submit" class="btn-primary btn-full">Create Account</button>
+                <button type="submit" class="btn-primary btn-full" data-i18n="signup.signup">Create Account</button>
             </form>
             <div class="modal-footer">
-                <p>Already have an account? <a href="#" onclick="closeModal('signup-modal'); showLogin();">Login</a></p>
+                <p data-i18n="signup.haveAccount">Already have an account? <a href="#" onclick="closeSignup(); showLogin();" data-i18n="signup.login">Login</a></p>
             </div>
         </div>
     </div>
 
-    <!-- JavaScript -->
-    <script src="js/main.js"></script>
-    <script src="js/auth.js"></script>
-    <script src="js/calculator.js"></script>
+    <script>
+        // ===== LANGUAGE SWITCHING =====
+        const languageSelect = document.getElementById('language-select');
+        const mobileLanguageSelect = document.getElementById('mobile-language-select');
+
+        function changeLanguage(lang) {
+            // Store selected language
+            localStorage.setItem('preferred-language', lang);
+            
+            // Update all elements with data-i18n attribute
+            document.querySelectorAll('[data-i18n]').forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                if (translations[lang] && translations[lang][key]) {
+                    element.textContent = translations[lang][key];
+                }
+            });
+            
+            // Update placeholders for inputs
+            document.querySelectorAll('input[data-i18n-placeholder]').forEach(input => {
+                const key = input.getAttribute('data-i18n-placeholder');
+                if (translations[lang] && translations[lang][key]) {
+                    input.placeholder = translations[lang][key];
+                }
+            });
+        }
+
+        // Language translations
+        const translations = {
+            en: {
+                // Navigation
+                "nav.home": "Home",
+                "nav.vat": "VAT Calculator",
+                "nav.tax": "Tax Calculator",
+                "nav.pricing": "Pricing",
+                "nav.faq": "FAQ",
+                "nav.login": "Login",
+                "nav.signup": "Sign Up",
+
+                // Hero Section
+                "hero.title": "Smart VAT & Tax Calculator for Bangladesh",
+                "hero.description": "Calculate VAT, income tax, and manage your finances with our powerful calculator designed specifically for Bangladeshi taxpayers.",
+                "hero.getStarted": "Get Started Free",
+                "hero.howItWorks": "How It Works",
+                "hero.calculations": "Calculations",
+                "hero.accuracy": "Accuracy",
+                "hero.support": "Support",
+
+                // Calculator
+                "calculator.title": "Quick Calculator",
+                "calculator.vat": "VAT",
+                "calculator.tax": "Income Tax",
+                "calculator.amount": "Amount (৳)",
+                "calculator.vatRate": "VAT Rate",
+                "calculator.customRate": "Custom VAT Rate (%)",
+                "calculator.calculateVAT": "Calculate VAT",
+                "calculator.vatAmount": "VAT Amount:",
+                "calculator.totalAmount": "Total Amount:",
+                "calculator.annualIncome": "Annual Income (৳)",
+                "calculator.calculateTax": "Calculate Tax",
+                "calculator.taxableIncome": "Taxable Income:",
+                "calculator.taxAmount": "Tax Amount:",
+
+                // Features
+                "features.title": "Why Choose VATAX?",
+                "features.fast": "Fast Calculations",
+                "features.fastDesc": "Calculate VAT and tax instantly with our optimized algorithms",
+                "features.bdSpecific": "Bangladesh Specific",
+                "features.bdSpecificDesc": "Designed specifically for Bangladeshi tax laws and rates",
+                "features.accurate": "100% Accurate",
+                "features.accurateDesc": "Based on latest NBR tax slabs and VAT regulations",
+                "features.mobile": "Mobile Friendly",
+                "features.mobileDesc": "Works perfectly on all devices - desktop, tablet, mobile",
+
+                // Pricing
+                "pricing.title": "Simple, Transparent Pricing",
+                "pricing.monthly": "Monthly",
+                "pricing.yearly": "Yearly",
+                "pricing.save": "Save 17%",
+                "pricing.free": "Free",
+                "pricing.freePrice": "Free Forever",
+                "pricing.free1": "Basic VAT Calculator",
+                "pricing.free2": "Basic Tax Calculator",
+                "pricing.free3": "5 Calculations per month",
+                "pricing.free4": "Save History",
+                "pricing.free5": "PDF Reports",
+                "pricing.getStartedFree": "Get Started Free",
+                "pricing.pro": "Pro",
+                "pricing.perMonth": "/month",
+                "pricing.pro1": "All Free Features",
+                "pricing.pro2": "Unlimited Calculations",
+                "pricing.pro3": "Save Calculation History",
+                "pricing.pro4": "PDF Export",
+                "pricing.pro5": "Email Reports",
+                "pricing.startTrial": "Start 7-Day Free Trial",
+                "pricing.enterprise": "Enterprise",
+                "pricing.custom": "Custom Pricing",
+                "pricing.enterprise1": "All Pro Features",
+                "pricing.enterprise2": "Multi-user Access",
+                "pricing.enterprise3": "API Access",
+                "pricing.enterprise4": "Custom Reports",
+                "pricing.enterprise5": "Dedicated Support",
+                "pricing.contactSales": "Contact Sales",
+                "pricing.mostPopular": "MOST POPULAR",
+
+                // FAQ
+                "faq.title": "Frequently Asked Questions",
+                "faq.q1": "How accurate is the tax calculation?",
+                "faq.a1": "Our calculations are based on the latest NBR tax slabs and VAT regulations. We update our system whenever there are changes in tax laws to ensure 100% accuracy.",
+                "faq.q2": "Can I use this for business purposes?",
+                "faq.a2": "Yes! Many businesses in Bangladesh use our calculator for their daily VAT and tax calculations. Our Pro plan offers additional features suitable for business use.",
+                "faq.q3": "Is my financial data safe?",
+                "faq.a3": "We take data security seriously. All your calculations and data are encrypted and stored securely. We never share your financial information with third parties.",
+                "faq.q4": "Do you offer refunds?",
+                "faq.a4": "Yes, we offer a 7-day money-back guarantee for all paid plans. If you're not satisfied, you can request a full refund within 7 days of purchase.",
+
+                // CTA
+                "cta.title": "Ready to Simplify Your Tax Calculations?",
+                "cta.description": "Join thousands of Bangladeshi taxpayers who trust VATAX for accurate and fast calculations.",
+                "cta.startFree": "Start Free Trial",
+
+                // Footer
+                "footer.description": "Smart VAT & Tax Calculator for Bangladesh. Accurate, fast, and reliable calculations for individuals and businesses.",
+                "footer.product": "Product",
+                "footer.company": "Company",
+                "footer.about": "About Us",
+                "footer.contact": "Contact",
+                "footer.privacy": "Privacy Policy",
+                "footer.terms": "Terms of Service",
+                "footer.support": "Support",
+                "footer.help": "Help Center",
+                "footer.rights": "All rights reserved.",
+
+                // Login Modal
+                "login.title": "Login to VATAX",
+                "login.email": "Email Address",
+                "login.password": "Password",
+                "login.remember": "Remember me",
+                "login.login": "Login",
+                "login.noAccount": "Don't have an account?",
+                "login.signup": "Sign up",
+
+                // Signup Modal
+                "signup.title": "Create Account",
+                "signup.fullName": "Full Name",
+                "signup.email": "Email Address",
+                "signup.password": "Password",
+                "signup.confirmPassword": "Confirm Password",
+                "signup.agree": "I agree to the Terms of Service and Privacy Policy",
+                "signup.signup": "Create Account",
+                "signup.haveAccount": "Already have an account?",
+                "signup.login": "Login"
+            },
+            bn: {
+                // Navigation
+                "nav.home": "হোম",
+                "nav.vat": "ভ্যাট ক্যালকুলেটর",
+                "nav.tax": "ট্যাক্স ক্যালকুলেটর",
+                "nav.pricing": "মূল্য",
+                "nav.faq": "সচরাচর জিজ্ঞাসা",
+                "nav.login": "লগইন",
+                "nav.signup": "সাইন আপ",
+
+                // Hero Section
+                "hero.title": "বাংলাদেশের জন্য স্মার্ট ভ্যাট ও ট্যাক্স ক্যালকুলেটর",
+                "hero.description": "ভ্যাট, আয়কর গণনা করুন এবং বাংলাদেশী করদাতাদের জন্য বিশেষভাবে ডিজাইন করা আমাদের শক্তিশালী ক্যালকুলেটর দিয়ে আপনার অর্থ ব্যবস্থাপনা করুন।",
+                "hero.getStarted": "বিনামূল্যে শুরু করুন",
+                "hero.howItWorks": "কিভাবে কাজ করে",
+                "hero.calculations": "গণনা",
+                "hero.accuracy": "সঠিকতা",
+                "hero.support": "সাপোর্ট",
+
+                // Calculator
+                "calculator.title": "দ্রুত ক্যালকুলেটর",
+                "calculator.vat": "ভ্যাট",
+                "calculator.tax": "আয়কর",
+                "calculator.amount": "পরিমাণ (৳)",
+                "calculator.vatRate": "ভ্যাট রেট",
+                "calculator.customRate": "কাস্টম ভ্যাট রেট (%)",
+                "calculator.calculateVAT": "ভ্যাট গণনা করুন",
+                "calculator.vatAmount": "ভ্যাট পরিমাণ:",
+                "calculator.totalAmount": "মোট পরিমাণ:",
+                "calculator.annualIncome": "বার্ষিক আয় (৳)",
+                "calculator.calculateTax": "ট্যাক্স গণনা করুন",
+                "calculator.taxableIncome": "করযোগ্য আয়:",
+                "calculator.taxAmount": "ট্যাক্স পরিমাণ:",
+
+                // Features
+                "features.title": "কেন VATAX বেছে নেবেন?",
+                "features.fast": "দ্রুত গণনা",
+                "features.fastDesc": "আমাদের অপ্টিমাইজড অ্যালগরিদম দিয়ে তাত্ক্ষণিকভাবে ভ্যাট এবং ট্যাক্স গণনা করুন",
+                "features.bdSpecific": "বাংলাদেশের জন্য",
+                "features.bdSpecificDesc": "বাংলাদেশের ট্যাক্স আইন এবং রেটের জন্য বিশেষভাবে ডিজাইন করা",
+                "features.accurate": "১০০% সঠিক",
+                "features.accurateDesc": "সর্বশেষ এনবিআর ট্যাক্স স্ল্যাব এবং ভ্যাট নিয়মাবলীর উপর ভিত্তি করে",
+                "features.mobile": "মোবাইল ফ্রেন্ডলি",
+                "features.mobileDesc": "সকল ডিভাইসে পুরোপুরি কাজ করে - ডেস্কটপ, ট্যাবলেট, মোবাইল",
+
+                // Pricing
+                "pricing.title": "সরল, স্বচ্ছ মূল্য",
+                "pricing.monthly": "মাসিক",
+                "pricing.yearly": "বার্ষিক",
+                "pricing.save": "১৭% সাশ্রয়",
+                "pricing.free": "ফ্রি",
+                "pricing.freePrice": "চিরকাল ফ্রি",
+                "pricing.free1": "বেসিক ভ্যাট ক্যালকুলেটর",
+                "pricing.free2": "বেসিক ট্যাক্স ক্যালকুলেটর",
+                "pricing.free3": "মাসে ৫টি গণনা",
+                "pricing.free4": "ইতিহাস সংরক্ষণ",
+                "pricing.free5": "পিডিএফ রিপোর্ট",
+                "pricing.getStartedFree": "বিনামূল্যে শুরু করুন",
+                "pricing.pro": "প্রো",
+                "pricing.perMonth": "/মাস",
+                "pricing.pro1": "সমস্ত ফ্রি ফিচার",
+                "pricing.pro2": "অসীম গণনা",
+                "pricing.pro3": "গণনার ইতিহাস সংরক্ষণ",
+                "pricing.pro4": "পিডিএফ এক্সপোর্ট",
+                "pricing.pro5": "ইমেইল রিপোর্ট",
+                "pricing.startTrial": "৭-দিনের ফ্রি ট্রায়াল শুরু করুন",
+                "pricing.enterprise": "এন্টারপ্রাইজ",
+                "pricing.custom": "কাস্টম মূল্য",
+                "pricing.enterprise1": "সমস্ত প্রো ফিচার",
+                "pricing.enterprise2": "মাল্টি-ইউজার অ্যাক্সেস",
+                "pricing.enterprise3": "এপিআই অ্যাক্সেস",
+                "pricing.enterprise4": "কাস্টম রিপোর্ট",
+                "pricing.enterprise5": "ডেডিকেটেড সাপোর্ট",
+                "pricing.contactSales": "সেলসে যোগাযোগ করুন",
+                "pricing.mostPopular": "সবচেয়ে জনপ্রিয়",
+
+                // FAQ
+                "faq.title": "সচরাচর জিজ্ঞাসা",
+                "faq.q1": "ট্যাক্স গণনা কতটা সঠিক?",
+                "faq.a1": "আমাদের গণনা সর্বশেষ এনবিআর ট্যাক্স স্ল্যাব এবং ভ্যাট নিয়মাবলীর উপর ভিত্তি করে। ট্যাক্স আইনে কোন পরিবর্তন হলে আমরা আমাদের সিস্টেম আপডেট করি যাতে ১০০% সঠিকতা নিশ্চিত হয়।",
+                "faq.q2": "আমি কি ব্যবসায়িক উদ্দেশ্যে এটি ব্যবহার করতে পারি?",
+                "faq.a2": "হ্যাঁ! বাংলাদেশের অনেক ব্যবসা প্রতিষ্ঠান তাদের দৈনন্দিন ভ্যাট এবং ট্যাক্স গণনার জন্য আমাদের ক্যালকুলেটর ব্যবহার করে। আমাদের প্রো প্ল্যান ব্যবসায়িক ব্যবহারের জন্য উপযুক্ত অতিরিক্ত ফিচার অফার করে।",
+                "faq.q3": "আমার আর্থিক ডেটা কি নিরাপদ?",
+                "faq.a3": "আমরা ডেটা সুরক্ষাকে গুরুত্বের সাথে নিই। আপনার সমস্ত গণনা এবং ডেটা এনক্রিপ্ট করা এবং নিরাপদে সংরক্ষণ করা হয়। আমরা কখনও তৃতীয় পক্ষের সাথে আপনার আর্থিক তথ্য শেয়ার করি না।",
+                "faq.q4": "আপনারা কি রিফান্ড অফার করেন?",
+                "faq.a4": "হ্যাঁ, আমরা সমস্ত পেইড প্ল্যানের জন্য ৭-দিনের মানি-ব্যাক গ্যারান্টি অফার করি। যদি আপনি সন্তুষ্ট না হন, তাহলে কেনার ৭ দিনের মধ্যে আপনি সম্পূর্ণ রিফান্ডের জন্য অনুরোধ করতে পারেন।",
+
+                // CTA
+                "cta.title": "আপনার ট্যাক্স গণনা সহজ করতে প্রস্তুত?",
+                "cta.description": "সঠিক এবং দ্রুত গণনার জন্য VATAX-এ বিশ্বাসী হাজার হাজার বাংলাদেশী করদাতার সাথে যোগ দিন।",
+                "cta.startFree": "ফ্রি ট্রায়াল শুরু করুন",
+
+                // Footer
+                "footer.description": "বাংলাদেশের জন্য স্মার্ট ভ্যাট ও ট্যাক্স ক্যালকুলেটর। ব্যক্তি এবং ব্যবসায়ের জন্য সঠিক, দ্রুত এবং নির্ভরযোগ্য গণনা।",
+                "footer.product": "পণ্য",
+                "footer.company": "কোম্পানি",
+                "footer.about": "আমাদের সম্পর্কে",
+                "footer.contact": "যোগাযোগ",
+                "footer.privacy": "গোপনীয়তা নীতি",
+                "footer.terms": "সেবার শর্তাবলী",
+                "footer.support": "সহায়তা",
+                "footer.help": "হেল্প সেন্টার",
+                "footer.rights": "সমস্ত অধিকার সংরক্ষিত।",
+
+                // Login Modal
+                "login.title": "VATAX-এ লগইন করুন",
+                "login.email": "ইমেইল ঠিকানা",
+                "login.password": "পাসওয়ার্ড",
+                "login.remember": "আমাকে মনে রাখুন",
+                "login.login": "লগইন",
+                "login.noAccount": "অ্যাকাউন্ট নেই?",
+                "login.signup": "সাইন আপ",
+
+                // Signup Modal
+                "signup.title": "অ্যাকাউন্ট তৈরি করুন",
+                "signup.fullName": "পুরো নাম",
+                "signup.email": "ইমেইল ঠিকানা",
+                "signup.password": "পাসওয়ার্ড",
+                "signup.confirmPassword": "পাসওয়ার্ড নিশ্চিত করুন",
+                "signup.agree": "আমি সেবার শর্তাবলী এবং গোপনীয়তা নীতি মেনে নিচ্ছি",
+                "signup.signup": "অ্যাকাউন্ট তৈরি করুন",
+                "signup.haveAccount": "ইতিমধ্যে অ্যাকাউন্ট আছে?",
+                "signup.login": "লগইন"
+            }
+        };
+
+        // Initialize language
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedLanguage = localStorage.getItem('preferred-language') || 'en';
+            languageSelect.value = savedLanguage;
+            mobileLanguageSelect.value = savedLanguage;
+            changeLanguage(savedLanguage);
+
+            // Language switcher event listeners
+            languageSelect.addEventListener('change', (e) => {
+                changeLanguage(e.target.value);
+                mobileLanguageSelect.value = e.target.value;
+            });
+
+            mobileLanguageSelect.addEventListener('change', (e) => {
+                changeLanguage(e.target.value);
+                languageSelect.value = e.target.value;
+            });
+
+            // Initialize calculator
+            initializeCalculator();
+        });
+
+        // ===== CALCULATOR FUNCTIONS =====
+        function initializeCalculator() {
+            // Show VAT calculator by default
+            switchCalcTab('vat');
+            
+            // Add event listener for VAT rate change
+            document.getElementById('quick-vat-rate').addEventListener('change', function() {
+                const customRateContainer = document.getElementById('custom-rate-container');
+                if (this.value === 'custom') {
+                    customRateContainer.classList.remove('hidden');
+                } else {
+                    customRateContainer.classList.add('hidden');
+                }
+            });
+        }
+
+        function switchCalcTab(tab) {
+            // Hide all calculator contents
+            document.querySelectorAll('.calc-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.calc-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab content and activate tab
+            document.getElementById(tab + '-calc').classList.remove('hidden');
+            event.target.classList.add('active');
+        }
+
+        function calculateQuickVAT() {
+            const amount = parseFloat(document.getElementById('quick-vat-amount').value);
+            const rateSelect = document.getElementById('quick-vat-rate');
+            let rate;
+            
+            if (rateSelect.value === 'custom') {
+                rate = parseFloat(document.getElementById('custom-vat-rate').value);
+            } else {
+                rate = parseFloat(rateSelect.value);
+            }
+            
+            if (isNaN(amount) || isNaN(rate)) {
+                alert('Please enter valid numbers');
+                return;
+            }
+            
+            const vatAmount = (amount * rate) / 100;
+            const totalAmount = amount + vatAmount;
+            
+            document.getElementById('quick-vat-amount-result').textContent = vatAmount.toFixed(2) + ' ৳';
+            document.getElementById('quick-vat-total-result').textContent = totalAmount.toFixed(2) + ' ৳';
+            document.getElementById('quick-vat-result').classList.add('show');
+        }
+
+        function calculateQuickTax() {
+            const income = parseFloat(document.getElementById('quick-tax-income').value);
+            
+            if (isNaN(income)) {
+                alert('Please enter a valid income amount');
+                return;
+            }
+            
+            // Simplified Bangladesh tax calculation (2024 rates)
+            let tax = 0;
+            let taxableIncome = income;
+            
+            // Basic exemption
+            const basicExemption = 350000; // 3.5 lakh
+            taxableIncome = Math.max(0, income - basicExemption);
+            
+            if (taxableIncome > 0) {
+                // Tax slabs for Bangladesh (simplified)
+                if (taxableIncome <= 100000) {
+                    tax = taxableIncome * 0.05;
+                } else if (taxableIncome <= 400000) {
+                    tax = 5000 + (taxableIncome - 100000) * 0.10;
+                } else if (taxableIncome <= 700000) {
+                    tax = 35000 + (taxableIncome - 400000) * 0.15;
+                } else if (taxableIncome <= 1100000) {
+                    tax = 80000 + (taxableIncome - 700000) * 0.20;
+                } else if (taxableIncome <= 1600000) {
+                    tax = 160000 + (taxableIncome - 1100000) * 0.25;
+                } else {
+                    tax = 285000 + (taxableIncome - 1600000) * 0.30;
+                }
+            }
+            
+            document.getElementById('quick-taxable-income').textContent = taxableIncome.toFixed(2) + ' ৳';
+            document.getElementById('quick-tax-amount').textContent = tax.toFixed(2) + ' ৳';
+            document.getElementById('quick-tax-result').classList.add('show');
+        }
+
+        // ===== MODAL FUNCTIONS =====
+        function showLogin() {
+            document.getElementById('login-modal').style.display = 'block';
+        }
+
+        function closeLogin() {
+            document.getElementById('login-modal').style.display = 'none';
+        }
+
+        function showSignup() {
+            document.getElementById('signup-modal').style.display = 'block';
+        }
+
+        function closeSignup() {
+            document.getElementById('signup-modal').style.display = 'none';
+        }
+
+        // ===== MOBILE MENU =====
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.classList.toggle('hidden');
+        }
+
+        // ===== FAQ TOGGLE =====
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.faq-question').forEach(question => {
+                question.addEventListener('click', () => {
+                    const answer = question.nextElementSibling;
+                    const icon = question.querySelector('i');
+                    
+                    // Toggle current answer
+                    if (answer.style.display === 'block') {
+                        answer.style.display = 'none';
+                        icon.className = 'fas fa-plus';
+                    } else {
+                        answer.style.display = 'block';
+                        icon.className = 'fas fa-minus';
+                    }
+                });
+            });
+        });
+
+        // ===== FORM HANDLING =====
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            // Add login logic here
+            alert('Login functionality will be implemented soon!');
+            closeLogin();
+        });
+
+        document.getElementById('signup-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            // Add signup logic here
+            alert('Signup functionality will be implemented soon!');
+            closeSignup();
+        });
+
+        // ===== PRICING TOGGLE =====
+        document.getElementById('billing-toggle').addEventListener('change', function() {
+            const monthlyPrices = document.querySelectorAll('.price-amount');
+            monthlyPrices.forEach(price => {
+                if (this.checked) {
+                    // Yearly pricing (with discount)
+                    const monthly = parseFloat(price.textContent);
+                    const yearly = monthly * 10; // 10 months for yearly (save 2 months)
+                    price.textContent = yearly.toFixed(0);
+                } else {
+                    // Monthly pricing
+                    price.textContent = '99';
+                }
+            });
+        });
+
+        // ===== OTHER FUNCTIONS =====
+        function upgradeToPro() {
+            showSignup();
+        }
+
+        function contactSales() {
+            alert('Please contact us at sales@vatax.com for enterprise pricing.');
+        }
+
+        // Close modals when clicking outside
+        window.onclick = function(event) {
+            const loginModal = document.getElementById('login-modal');
+            const signupModal = document.getElementById('signup-modal');
+            
+            if (event.target === loginModal) {
+                closeLogin();
+            }
+            if (event.target === signupModal) {
+                closeSignup();
+            }
+        }
+    </script>
 </body>
 </html>
